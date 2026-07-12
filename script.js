@@ -16,7 +16,25 @@ let currentStep = 0;
 const totalSteps = steps.length;
 
 const answers = {};
+const fields = [
+    "modelo",
+    "armazenamento",
+    "cor",
+    "liga",
+    "tela",
+    "traseira",
+    "bateria",
+    "pecas"
+];
 
+const params = new URLSearchParams(window.location.search);
+
+answers.utm_source = params.get("utm_source") || "";
+answers.utm_medium = params.get("utm_medium") || "";
+answers.utm_campaign = params.get("utm_campaign") || "";
+answers.gclid = params.get("gclid") || "";
+answers.fbclid = params.get("fbclid") || "";
+answers.dispositivo = navigator.userAgent;
 /* ==========================
 INICIAR
 ========================== */
@@ -73,8 +91,11 @@ document.querySelectorAll(".option").forEach(button => {
 
         const question = step.querySelector("h2").innerText;
 
-        answers[question] = button.innerText;
+const index = [...steps].indexOf(step);
 
+if (fields[index]) {
+    answers[fields[index]] = button.innerText;
+}
         setTimeout(() => {
 
             if (currentStep < totalSteps - 1) {
