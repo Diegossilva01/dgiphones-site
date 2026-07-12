@@ -715,5 +715,19 @@ padding:40px 25px;
 .loading-box{
 padding:40px 25px;
 }
+.erro{
+    display:block;
+    color:#e53935;
+    font-size:14px;
+    margin-top:6px;
+    font-weight:600;
+}
 
+.input-error{
+    border:2px solid #e53935 !important;
+}
+
+.input-ok{
+    border:2px solid #28a745 !important;
+}
 }
