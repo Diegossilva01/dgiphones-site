@@ -26,9 +26,9 @@ CONTAINER
 
 .container{
 width:100%;
-max-width:1200px;
+max-width:1350px;
 margin:auto;
-padding:0 24px;
+padding:0 40px;
 }
 
 /* ==========================
@@ -91,7 +91,7 @@ background:#fff;
 .hero-container{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:70px;
+gap:100px;
 align-items:center;
 }
 
@@ -107,10 +107,9 @@ margin-bottom:25px;
 }
 
 .hero h1{
-font-size:60px;
+font-size:72px;
+line-height:1;
 font-weight:800;
-line-height:1.1;
-margin-bottom:25px;
 }
 
 .hero p{
@@ -156,12 +155,18 @@ display:flex;
 justify-content:center;
 }
 
-.hero-right img{
-width:420px;
-max-width:100%;
-animation:float 5s infinite ease-in-out;
+.hero-right{
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
 
+.hero-right img{
+    width:100%;
+    max-width:620px;
+    height:auto;
+    animation:float 5s ease-in-out infinite;
+}
 @keyframes float{
 
 0%{
