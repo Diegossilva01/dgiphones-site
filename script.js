@@ -247,6 +247,22 @@ if (telefone) {
             this.value = v;
         }
     });
+
+   // Validação do nome e telefone
+const nome = document.getElementById("nome");
+const botao = document.getElementById("finishButton");
+
+function validarFormulario() {
+    const nomeValido = nome.value.trim().length >= 3;
+    const telefoneValido = telefone.value.replace(/\D/g, "").length === 11;
+
+    botao.disabled = !(nomeValido && telefoneValido);
+}
+
+nome.addEventListener("input", validarFormulario);
+telefone.addEventListener("input", validarFormulario);
+
+validarFormulario();
 }
 
 showStep(0);
