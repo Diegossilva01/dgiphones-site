@@ -248,35 +248,21 @@ if (telefone) {
         }
     });
 
-  function validarFormulario() {
+   // Validação do nome e telefone
+const nome = document.getElementById("nome");
+const botao = document.getElementById("finishButton");
 
+function validarFormulario() {
     const nomeValido = nome.value.trim().length >= 3;
     const telefoneValido = telefone.value.replace(/\D/g, "").length === 11;
 
-    const erroNome = document.getElementById("erroNome");
-    const erroTelefone = document.getElementById("erroTelefone");
-
-    erroNome.textContent = "";
-    erroTelefone.textContent = "";
-
-    nome.classList.remove("input-error","input-ok");
-    telefone.classList.remove("input-error","input-ok");
-
-    if(!nomeValido){
-        erroNome.textContent = "Digite seu nome.";
-        nome.classList.add("input-error");
-    }else{
-        nome.classList.add("input-ok");
-    }
-
-    if(!telefoneValido){
-        erroTelefone.textContent = "Digite um WhatsApp válido.";
-        telefone.classList.add("input-error");
-    }else{
-        telefone.classList.add("input-ok");
-    }
-
     botao.disabled = !(nomeValido && telefoneValido);
 }
-showStep(0);
 
+nome.addEventListener("input", validarFormulario);
+telefone.addEventListener("input", validarFormulario);
+
+validarFormulario();
+}
+
+showStep(0);
