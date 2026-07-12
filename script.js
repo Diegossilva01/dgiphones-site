@@ -182,7 +182,7 @@ GOOGLE SHEETS
 
 try{
 
-await fetch("COLE_AQUI_URL_DO_APPS_SCRIPT",{
+await fetch("https://script.google.com/macros/s/AKfycbxMu3BP2bif1gnx7VYLf_uc3C9fxJRcKqlUo38ejHRrVYHRVfkP8spefwegJrEFUet9/exec",{
 
 method:"POST",
 
