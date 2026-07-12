@@ -13,7 +13,6 @@ const quote = document.getElementById("quote");
 const form = document.getElementById("quoteForm");
 
 let currentStep = 0;
-
 const totalSteps = steps.length;
 
 const answers = {};
@@ -25,88 +24,73 @@ INICIAR
 const start = document.getElementById("start");
 
 if (start) {
-
-start.addEventListener("click", () => {
-
-document.getElementById("quote").scrollIntoView({
-behavior:"smooth"
-});
-
-});
-
+    start.addEventListener("click", () => {
+        document.getElementById("quote").scrollIntoView({
+            behavior: "smooth"
+        });
+    });
 }
 
 /* ==========================
 ATUALIZA PROGRESSO
 ========================== */
 
-function updateProgress(){
-
-const percent=((currentStep+1)/totalSteps)*100;
-
-progressFill.style.width=percent+"%";
-
-progressNumber.innerHTML=`${currentStep+1} / ${totalSteps}`;
-
+function updateProgress() {
+    const percent = ((currentStep + 1) / totalSteps) * 100;
+    progressFill.style.width = percent + "%";
+    progressNumber.innerHTML = `${currentStep + 1} / ${totalSteps}`;
 }
 
 /* ==========================
 MOSTRAR ETAPA
 ========================== */
 
-function showStep(index){
+function showStep(index) {
+    steps.forEach(step => step.classList.remove("active"));
 
-steps.forEach(step=>step.classList.remove("active"));
-
-steps[index].classList.add("active");
-
-currentStep=index;
-
-updateProgress();
-
+    if (steps[index]) {
+        steps[index].classList.add("active");
+        currentStep = index;
+        updateProgress();
+    }
 }
 
 /* ==========================
 BOTÕES DE OPÇÃO
 ========================== */
 
-document.querySelectorAll(".option").forEach(button=>{
+document.querySelectorAll(".option").forEach(button => {
 
-button.addEventListener("click",()=>{
+    button.addEventListener("click", () => {
 
-const parent=button.parentElement;
+        const step = button.closest(".step");
 
-parent.querySelectorAll(".option").forEach(btn=>{
+        step.querySelectorAll(".option").forEach(btn => {
+            btn.classList.remove("selected");
+        });
 
-btn.classList.remove("selected");
+        button.classList.add("selected");
 
-});
+        const question = step.querySelector("h2").innerText;
 
-button.classList.add("selected");
+        answers[question] = button.innerText;
 
-const question=button.closest(".step").querySelector("h2").innerText;
+        setTimeout(() => {
 
-answers[question]=button.innerText;
+            if (currentStep < totalSteps - 1) {
 
-setTimeout(()=>{
+                showStep(currentStep + 1);
 
-if(currentStep<totalSteps-1){
+                window.scrollTo({
+                    top: document.getElementById("quote").offsetTop - 80,
+                    behavior: "smooth"
+                });
 
-showStep(currentStep+1);
+            }
 
-window.scrollTo({
+        }, 250);
 
-top:document.getElementById("quote").offsetTop-80,
-
-behavior:"smooth"
-
-});
-
-}
-
-},250);
-
-});
+    });
 
 });
 
@@ -114,29 +98,25 @@ behavior:"smooth"
 BUSCA MODELOS
 ========================== */
 
-const search=document.getElementById("search");
+const search = document.getElementById("search");
 
-if(search){
+if (search) {
 
-search.addEventListener("keyup",()=>{
+    search.addEventListener("keyup", () => {
 
-const value=search.value.toLowerCase();
+        const value = search.value.toLowerCase();
 
-document.querySelectorAll("#quote .option").forEach(card=>{
+        document.querySelectorAll(".step:first-child .option").forEach(card => {
 
-if(card.innerText.toLowerCase().includes(value)){
+            if (card.innerText.toLowerCase().includes(value)) {
+                card.style.display = "flex";
+            } else {
+                card.style.display = "none";
+            }
 
-card.style.display="flex";
+        });
 
-}else{
-
-card.style.display="none";
-
-}
-
-});
-
-});
+    });
 
 }
 
@@ -144,19 +124,17 @@ card.style.display="none";
 BOTÃO VOLTAR
 ========================== */
 
-const back=document.getElementById("backButton");
+const back = document.getElementById("backButton");
 
-if(back){
+if (back) {
 
-back.addEventListener("click",()=>{
+    back.addEventListener("click", () => {
 
-if(currentStep>0){
+        if (currentStep > 0) {
+            showStep(currentStep - 1);
+        }
 
-showStep(currentStep-1);
-
-}
-
-});
+    });
 
 }
 
@@ -164,61 +142,48 @@ showStep(currentStep-1);
 ENVIO
 ========================== */
 
-form.addEventListener("submit",async(e)=>{
+form.addEventListener("submit", async (e) => {
 
-e.preventDefault();
+    e.preventDefault();
 
-answers.nome=document.getElementById("nome").value;
+    answers.nome = document.getElementById("nome").value;
+    answers.telefone = document.getElementById("telefone").value;
 
-answers.telefone=document.getElementById("telefone").value;
+    quote.style.display = "none";
+    loading.style.display = "block";
 
-quote.style.display="none";
+    try {
 
-loading.style.display="block";
+        await fetch("https://script.google.com/macros/s/AKfycbxMu3BP2bif1gnx7VYLf_uc3C9fxJRcKqlUo38ejHRrVYHRVfkP8spefwegJrEFUet9/exec", {
 
-/* ==========
-GOOGLE SHEETS
-========== */
+            method: "POST",
+            mode: "no-cors",
 
-try{
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-await fetch("https://script.google.com/macros/s/AKfycbxMu3BP2bif1gnx7VYLf_uc3C9fxJRcKqlUo38ejHRrVYHRVfkP8spefwegJrEFUet9/exec",{
+            body: JSON.stringify(answers)
 
-method:"POST",
+        });
 
-mode:"no-cors",
+    } catch (error) {
 
-headers:{
+        console.log(error);
 
-"Content-Type":"application/json"
+    }
 
-},
+    setTimeout(() => {
 
-body:JSON.stringify(answers)
+        loading.style.display = "none";
+        success.style.display = "block";
 
-});
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
 
-}catch(error){
-
-console.log(error);
-
-}
-
-setTimeout(()=>{
-
-loading.style.display="none";
-
-success.style.display="block";
-
-window.scrollTo({
-
-top:0,
-
-behavior:"smooth"
-
-});
-
-},2500);
+    }, 2500);
 
 });
 
@@ -226,24 +191,22 @@ behavior:"smooth"
 NOVA AVALIAÇÃO
 ========================== */
 
-const newQuote=document.getElementById("newQuote");
+const newQuote = document.getElementById("newQuote");
 
-if(newQuote){
+if (newQuote) {
 
-newQuote.addEventListener("click",(e)=>{
+    newQuote.addEventListener("click", (e) => {
 
-e.preventDefault();
+        e.preventDefault();
 
-location.reload();
+        location.reload();
 
-});
+    });
 
 }
 
 /* ==========================
 INICIAR
 ========================== */
-
-updateProgress();
 
 showStep(0);
