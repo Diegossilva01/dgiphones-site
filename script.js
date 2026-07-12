@@ -83,53 +83,33 @@ document.querySelectorAll(".option").forEach(button => {
 
         const step = button.closest(".step");
 
-       const index = [...steps].indexOf(step);
+        step.querySelectorAll(".option").forEach(btn => {
+            btn.classList.remove("selected");
+        });
+
+        button.classList.add("selected");
+
+        const question = step.querySelector("h2").innerText;
 
 const index = [...steps].indexOf(step);
 
-// Etapas que aceitam múltiplas escolhas:
-// 4 = Tela
-// 5 = Traseira
-// 7 = Peças trocadas
-const multiSelect = [4, 5, 7];
-
-if (multiSelect.includes(index)) {
-
-    button.classList.toggle("selected");
-
-    const selecionados = [...step.querySelectorAll(".selected")]
-        .map(btn => btn.innerText);
-
-    answers[fields[index]] = selecionados.join(", ");
-
-} else {
-
-    step.querySelectorAll(".option").forEach(btn => {
-        btn.classList.remove("selected");
-    });
-
-    button.classList.add("selected");
-
-    if (fields[index]) {
-        answers[fields[index]] = button.innerText;
-    }
-
-    setTimeout(() => {
-
-        if (currentStep < totalSteps - 1) {
-
-            showStep(currentStep + 1);
-
-            window.scrollTo({
-                top: document.getElementById("quote").offsetTop - 80,
-                behavior: "smooth"
-            });
-
-        }
-
-    }, 250);
-
+if (fields[index]) {
+    answers[fields[index]] = button.innerText;
 }
+        setTimeout(() => {
+
+            if (currentStep < totalSteps - 1) {
+
+                showStep(currentStep + 1);
+
+                window.scrollTo({
+                    top: document.getElementById("quote").offsetTop - 80,
+                    behavior: "smooth"
+                });
+
+            }
+
+        }, 250);
 
     });
 
