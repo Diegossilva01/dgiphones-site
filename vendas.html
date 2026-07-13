@@ -1,1 +1,402 @@
-<!DOCTYPE html><html lang='pt-BR'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>DGIPHONES Loja</title><link rel='stylesheet' href='vendas.css'></head><body><header class='topo'><div class='logo'>DG<span>IPHONES</span></div><nav><a href='index.html'>Início</a><a href='vendas.html'>Loja</a></nav></header><section class='hero'><h1>iPhones Seminovos</h1><p>Revisados e com garantia.</p><input id='busca' placeholder='Buscar...' oninput='filtrarProdutos(this.value)'></section><div id='filtros' class='filtros'></div><div id='produtos' class='grid'>Carregando...</div><script src='vendas.js'></script></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>DGIPHONES | Loja</title>
+
+<meta name="description" content="Compre iPhones seminovos com garantia. Loja física, PIX e cartão em até 12x sem juros.">
+
+<link rel="stylesheet" href="vendas.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+
+<header>
+
+<div class="container">
+
+<a class="logo" href="index.html">
+DG<span>IPHONES</span>
+</a>
+
+<nav>
+
+<a href="index.html">Vender iPhone</a>
+
+<a href="#produtos">Produtos</a>
+
+<a href="#vantagens">Vantagens</a>
+
+<a href="#loja">Loja Física</a>
+
+<a href="#faq">FAQ</a>
+
+</nav>
+
+</div>
+
+</header>
+
+<section class="hero">
+
+<div class="container hero-container">
+
+<div class="hero-left">
+
+<span class="badge">
+
+★★★★★ Loja Física • Garantia • Envio para todo o Brasil
+
+</span>
+
+<h1>
+
+Encontre seu próximo iPhone
+
+</h1>
+
+<p>
+
+Todos os aparelhos passam por testes rigorosos antes da venda.
+
+Compre com segurança na DGIPHONES.
+
+</p>
+
+<div class="hero-buttons">
+
+<a href="#produtos" class="btn-primary">
+
+Ver aparelhos
+
+</a>
+
+<a href="index.html" class="btn-secondary">
+
+Vender meu iPhone
+
+</a>
+
+</div>
+
+<div class="hero-info">
+
+<div>
+
+✔ Garantia
+
+</div>
+
+<div>
+
+✔ Loja Física
+
+</div>
+
+<div>
+
+✔ PIX
+
+</div>
+
+<div>
+
+✔ Cartão até 12x
+
+</div>
+
+</div>
+
+</div>
+
+<div class="hero-right">
+
+<img src="assets/images/iphone.png">
+
+</div>
+
+</div>
+
+</section>
+
+<section class="search-area">
+
+<div class="container">
+
+<input
+
+type="text"
+
+id="search"
+
+placeholder="Pesquisar modelo..."
+
+oninput="filtrarProdutos(this.value)">
+
+<div id="filtros" class="filtros">
+
+</div>
+
+</div>
+
+</section>
+
+<section id="produtos">
+
+<div class="container">
+
+<div class="section-title">
+
+<span>
+
+IPHONES DISPONÍVEIS
+
+</span>
+
+<h2>
+
+Escolha seu próximo iPhone
+
+</h2>
+
+<p>
+
+Todos os aparelhos possuem procedência e passam por testes antes da venda.
+
+</p>
+
+</div>
+
+<div id="produtos-grid">
+
+<div class="loading">
+
+Carregando aparelhos...
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+<section id="vantagens">
+
+<div class="container">
+
+<div class="section-title">
+
+<span>POR QUE COMPRAR NA DGIPHONES</span>
+
+<h2>Compra segura do início ao fim</h2>
+
+</div>
+
+<div class="vantagens-grid">
+
+<div class="vantagem-card">
+
+<i class="fas fa-shield-alt"></i>
+
+<h3>Garantia</h3>
+
+<p>Todos os aparelhos possuem garantia e passam por testes antes da venda.</p>
+
+</div>
+
+<div class="vantagem-card">
+
+<i class="fas fa-credit-card"></i>
+
+<h3>Até 12x</h3>
+
+<p>Parcele sua compra em até 12x sem juros no cartão.</p>
+
+</div>
+
+<div class="vantagem-card">
+
+<i class="fas fa-store"></i>
+
+<h3>Loja Física</h3>
+
+<p>Retire pessoalmente ou conheça nossa loja.</p>
+
+</div>
+
+<div class="vantagem-card">
+
+<i class="fas fa-truck"></i>
+
+<h3>Envio</h3>
+
+<p>Enviamos para todo o Brasil.</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<section id="loja">
+
+<div class="container loja-box">
+
+<div>
+
+<span class="badge">
+
+NOSSA LOJA
+
+</span>
+
+<h2>Venha nos visitar</h2>
+
+<p>
+
+Rua Itapaiúna, 2960
+
+<br>
+
+Vila Andrade - São Paulo/SP
+
+</p>
+
+<p>
+
+Atendimento:
+
+Segunda à Sexta das 10h às 20h
+
+Sábado das 10h às 14h
+
+</p>
+
+<a class="btn-primary"
+
+target="_blank"
+
+href="https://maps.google.com/?q=Rua+Itapaiuna+2960+Sao+Paulo">
+
+Como chegar
+
+</a>
+
+</div>
+
+</div>
+
+</section>
+
+<section id="faq">
+
+<div class="container">
+
+<div class="section-title">
+
+<span>DÚVIDAS</span>
+
+<h2>Perguntas Frequentes</h2>
+
+</div>
+
+<div class="faq">
+
+<div class="faq-item">
+
+<h3>Os aparelhos possuem garantia?</h3>
+
+<p>Sim. Todos possuem garantia e passam por testes antes da venda.</p>
+
+</div>
+
+<div class="faq-item">
+
+<h3>Posso parcelar?</h3>
+
+<p>Sim. Parcelamos em até 12x sem juros no cartão.</p>
+
+</div>
+
+<div class="faq-item">
+
+<h3>Tem desconto no PIX?</h3>
+
+<p>Sim. O valor anunciado no PIX já possui 10% de desconto.</p>
+
+</div>
+
+<div class="faq-item">
+
+<h3>Vocês enviam?</h3>
+
+<p>Enviamos para todo o Brasil ou você pode retirar na loja.</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<footer>
+
+<div class="container footer">
+
+<div>
+
+<h3>DGIPHONES</h3>
+
+<p>Especialistas em compra e venda de iPhones.</p>
+
+</div>
+
+<div>
+
+<h4>Contato</h4>
+
+<p>WhatsApp</p>
+
+<p>Instagram</p>
+
+</div>
+
+<div>
+
+<h4>Endereço</h4>
+
+<p>Rua Itapaiúna, 2960</p>
+
+<p>Vila Andrade - São Paulo/SP</p>
+
+</div>
+
+</div>
+
+<div class="copy">
+
+© 2026 DGIPHONES - Todos os direitos reservados.
+
+</div>
+
+</footer>
+
+<script src="vendas.js"></script>
+
+</body>
+
+</html>
