@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CellTech Panamby | Venda seu iPhone</title>
+  <meta name="description" content="Venda seu iPhone usado ou com defeito. Faça uma avaliação online e receba uma proposta personalizada da CellTech Panamby.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-content">
+    <a href="#topo" class="logo">CellTech <span>Panamby</span></a>
+    <nav>
+      <a href="vendas.html" class="buy-header"><i class="fa-solid fa-bag-shopping"></i> Comprar iPhone</a>
+      <a href="#como">Como funciona</a>
+      <a href="#vantagens">Vantagens</a>
+      <a href="#avaliacoes">Avaliações</a>
+      <a href="#faq">FAQ</a>
+    
+<a class="whatsapp-header" href="https://wa.me/5511977030517?text=Olá%2C%20vim%20pelo%20site%20da%20CellTech%20Panamby%20e%20gostaria%20de%20mais%20informações." target="_blank" rel="noopener">
+  <i class="fa-brands fa-whatsapp"></i>
+  Falar no WhatsApp
+</a>
+</nav>
+  </div>
+</header>
+
+<main id="topo">
+<section class="hero">
+  <div class="container hero-container">
+    <div class="hero-left">
+      <span class="badge"><i class="fa-solid fa-star"></i> Loja física • Avaliação gratuita • PIX imediato</span>
+      <h1>Quanto vale seu <span>iPhone?</span></h1>
+      <p>Faça sua cotação online em menos de 1 minuto. Nossa equipe analisará seu aparelho e enviará uma proposta personalizada.</p>
+
+      <div class="hero-actions">
+        <button id="start">Começar avaliação <i class="fa-solid fa-arrow-right"></i></button>
+        <a href="vendas.html" class="secondary-button">Ver iPhones à venda</a>
+      </div>
+
+      <div class="hero-trust">
+        <div><i class="fa-solid fa-bolt"></i><span><strong>Pagamento rápido</strong> via PIX após aprovação</span></div>
+        <div><i class="fa-solid fa-shield-halved"></i><span><strong>Processo seguro</strong> em loja física</span></div>
+        <div><i class="fa-solid fa-mobile-screen-button"></i><span><strong>Compramos usados</strong> e aparelhos com defeito</span></div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-glow"></div>
+      <img src="assets/pessoa-celltech-transparente.png" alt="iPhone em destaque">
+    </div>
+  </div>
+</section>
+
+<section class="trust-strip">
+  <div class="container trust-grid">
+    <div><i class="fa-solid fa-store"></i><span>Loja física</span></div>
+    <div><i class="fa-solid fa-user-shield"></i><span>Atendimento especializado</span></div>
+    <div><i class="fa-solid fa-clock"></i><span>Cotação rápida</span></div>
+    <div><i class="fa-solid fa-money-bill-transfer"></i><span>Pagamento via PIX</span></div>
+  </div>
+</section>
+
+<section id="quote">
+  <div class="container quote-container">
+    <div class="section-title">
+      <span>AVALIAÇÃO ONLINE</span>
+      <h2>Conte-nos sobre o seu iPhone</h2>
+      <p>Responda às etapas abaixo para receber uma análise personalizada.</p>
+    </div>
+
+    <div class="progressBox">
+      <div class="progressText">
+        <span>Progresso da avaliação</span>
+        <span id="progressNumber">1 / 9</span>
+      </div>
+      <div class="progress"><div class="progressFill"></div></div>
+    </div>
+
+    <form id="quoteForm" novalidate>
+
+      <div class="step active" data-field="modelo" data-mode="single">
+        <div class="step-header">
+          <span>Etapa 1</span>
+          <h2>Qual é o modelo do seu iPhone?</h2>
+          <p>Pesquise ou selecione uma opção.</p>
+        </div>
+        <div class="search-model">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="search" placeholder="Pesquisar modelo">
+        </div>
+        <div class="grid model-grid">
+          <button type="button" class="option">iPhone XR</button>
+          <button type="button" class="option">iPhone XS</button>
+          <button type="button" class="option">iPhone XS Max</button>
+          <button type="button" class="option">iPhone 11</button>
+          <button type="button" class="option">iPhone 11 Pro</button>
+          <button type="button" class="option">iPhone 11 Pro Max</button>
+          <button type="button" class="option">iPhone SE</button>
+          <button type="button" class="option">iPhone 12 Mini</button>
+          <button type="button" class="option">iPhone 12</button>
+          <button type="button" class="option">iPhone 12 Pro</button>
+          <button type="button" class="option">iPhone 12 Pro Max</button>
+          <button type="button" class="option">iPhone 13 Mini</button>
+          <button type="button" class="option">iPhone 13</button>
+          <button type="button" class="option">iPhone 13 Pro</button>
+          <button type="button" class="option">iPhone 13 Pro Max</button>
+          <button type="button" class="option">iPhone 14</button>
+          <button type="button" class="option">iPhone 14 Plus</button>
+          <button type="button" class="option">iPhone 14 Pro</button>
+          <button type="button" class="option">iPhone 14 Pro Max</button>
+          <button type="button" class="option">iPhone 15</button>
+          <button type="button" class="option">iPhone 15 Plus</button>
+          <button type="button" class="option">iPhone 15 Pro</button>
+          <button type="button" class="option">iPhone 15 Pro Max</button>
+          <button type="button" class="option">iPhone 16</button>
+          <button type="button" class="option">iPhone 16 Plus</button>
+          <button type="button" class="option">iPhone 16 Pro</button>
+          <button type="button" class="option">iPhone 16 Pro Max</button>
+          <button type="button" class="option">iPhone 17</button>
+          <button type="button" class="option">iPhone 17 Air</button>
+          <button type="button" class="option">iPhone 17 Pro</button>
+          <button type="button" class="option">iPhone 17 Pro Max</button>
+        </div>
+      </div>
+
+      <div class="step" data-field="armazenamento" data-mode="single">
+        <div class="step-header"><span>Etapa 2</span><h2>Qual é o armazenamento?</h2><p>Escolha a capacidade do aparelho.</p></div>
+        <div class="grid compact-grid">
+          <button type="button" class="option">64 GB</button>
+          <button type="button" class="option">128 GB</button>
+          <button type="button" class="option">256 GB</button>
+          <button type="button" class="option">512 GB</button>
+          <button type="button" class="option">1 TB</button>
+        </div>
+      </div>
+
+      <div class="step" data-field="cor" data-mode="single">
+        <div class="step-header"><span>Etapa 3</span><h2>Qual é a cor?</h2><p>Selecione a cor predominante.</p></div>
+        <div class="grid compact-grid">
+          <button type="button" class="option">Preto</button>
+          <button type="button" class="option">Branco</button>
+          <button type="button" class="option">Azul</button>
+          <button type="button" class="option">Roxo</button>
+          <button type="button" class="option">Verde</button>
+          <button type="button" class="option">Vermelho</button>
+          <button type="button" class="option">Titânio</button>
+          <button type="button" class="option">Outra</button>
+        </div>
+      </div>
+
+      <div class="step" data-field="liga" data-mode="single">
+        <div class="step-header"><span>Etapa 4</span><h2>O aparelho liga normalmente?</h2><p>Escolha uma opção.</p></div>
+        <div class="grid two-grid">
+          <button type="button" class="option"><i class="fa-solid fa-power-off"></i> Sim, liga normalmente</button>
+          <button type="button" class="option"><i class="fa-solid fa-triangle-exclamation"></i> Não liga</button>
+        </div>
+      </div>
+
+      <div class="step multi-step" data-field="tela" data-mode="multi">
+        <div class="step-header"><span>Etapa 5</span><h2>Como está a tela do aparelho?</h2><p>Você pode selecionar mais de uma opção.</p></div>
+        <div class="grid compact-grid">
+          <button type="button" class="option">Vidro trincado</button>
+          <button type="button" class="option">Vidro arranhado</button>
+          <button type="button" class="option">Display com manchas</button>
+          <button type="button" class="option">Touch com defeito</button>
+          <button type="button" class="option">Tela descolando</button>
+          <button type="button" class="option exclusive-option">Tela perfeita</button>
+        </div>
+        <button type="button" class="continue-button">Continuar</button>
+      </div>
+
+      <div class="step multi-step" data-field="traseira" data-mode="multi">
+        <div class="step-header"><span>Etapa 6</span><h2>Como está a traseira?</h2><p>Você pode selecionar mais de uma opção.</p></div>
+        <div class="grid compact-grid">
+          <button type="button" class="option">Traseira quebrada</button>
+          <button type="button" class="option">Arranhada</button>
+          <button type="button" class="option">Amassada</button>
+          <button type="button" class="option">Descascada</button>
+          <button type="button" class="option">Traseira descolando</button>
+          <button type="button" class="option exclusive-option">Perfeita</button>
+        </div>
+        <button type="button" class="continue-button">Continuar</button>
+      </div>
+
+      <div class="step" data-field="bateria" data-mode="single">
+        <div class="step-header"><span>Etapa 7</span><h2>Qual é a saúde da bateria?</h2><p>Escolha a opção que melhor representa o aparelho.</p></div>
+        <div class="grid three-grid">
+          <button type="button" class="option">Superior a 80%</button>
+          <button type="button" class="option">Inferior a 80%</button>
+          <button type="button" class="option">Não sei informar</button>
+        </div>
+      </div>
+
+      <div class="step multi-step" data-field="pecas" data-mode="multi">
+        <div class="step-header"><span>Etapa 8</span><h2>Existe alguma peça trocada?</h2><p>Você pode selecionar mais de uma opção.</p></div>
+        <div class="grid compact-grid">
+          <button type="button" class="option">Tela</button>
+          <button type="button" class="option">Bateria</button>
+          <button type="button" class="option">Carcaça</button>
+          <button type="button" class="option">Outra peça</button>
+          <button type="button" class="option exclusive-option">Nenhuma peça trocada</button>
+        </div>
+        <button type="button" class="continue-button">Continuar</button>
+      </div>
+
+      <div class="step" data-field="contato" data-mode="form">
+        <div class="step-header"><span>Etapa 9</span><h2>Quase lá!</h2><p>Informe seus dados para receber sua proposta.</p></div>
+
+        <div class="contact-card">
+          <div class="input-group">
+            <label for="nome">Nome</label>
+            <input type="text" id="nome" placeholder="Seu nome completo" autocomplete="name" required>
+            <small class="field-error" id="nomeErro"></small>
+          </div>
+
+          <div class="input-group">
+            <label for="telefone">WhatsApp</label>
+            <input type="tel" id="telefone" placeholder="(11) 99999-9999" maxlength="15" inputmode="numeric" autocomplete="tel" required>
+            <small class="field-error" id="telefoneErro"></small>
+          </div>
+
+          <div class="privacy-note"><i class="fa-solid fa-lock"></i> Seus dados serão usados apenas para retornar sua cotação.</div>
+        </div>
+
+        <div class="buttons">
+          <button type="button" id="backButton"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+          <button type="submit" id="finishButton">Receber proposta <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</section>
+
+<section id="loading">
+  <div class="container">
+    <div class="loading-box">
+      <div class="spinner"></div>
+      <span>ENVIANDO AVALIAÇÃO</span>
+      <h2>Analisando seu aparelho...</h2>
+      <p>Nossa equipe está registrando sua solicitação.</p>
+    </div>
+  </div>
+</section>
+
+<section id="success">
+  <div class="container">
+    <div class="success-card">
+      <div class="success-icon">✓</div>
+      <span>SOLICITAÇÃO RECEBIDA</span>
+      <h2>Recebemos sua avaliação!</h2>
+      <p>Seus dados foram enviados com sucesso. Em breve um especialista da CellTech Panamby entrará em contato pelo WhatsApp.</p>
+
+      <div class="success-details">
+        <div><i class="fa-solid fa-clock"></i> Atendimento rápido</div>
+        <div><i class="fa-brands fa-whatsapp"></i> Retorno pelo WhatsApp</div>
+        <div><i class="fa-brands fa-pix"></i> Pagamento via PIX</div>
+      </div>
+
+      <a href="#" id="newQuote">Fazer nova avaliação</a>
+    </div>
+  </div>
+</section>
+
+<section id="como">
+  <div class="container">
+    <div class="section-title"><span>COMO FUNCIONA</span><h2>Venda seu iPhone em 3 passos</h2><p>Rápido, seguro e sem burocracia.</p></div>
+
+    <div class="cards-info">
+      <article class="info-card"><div class="number">01</div><i class="fa-solid fa-list-check"></i><h3>Preencha a avaliação</h3><p>Informe o modelo e as condições do aparelho.</p></article>
+      <article class="info-card"><div class="number">02</div><i class="fa-solid fa-magnifying-glass-chart"></i><h3>Receba nossa análise</h3><p>Nossa equipe analisa as informações enviadas.</p></article>
+      <article class="info-card"><div class="number">03</div><i class="fa-brands fa-whatsapp"></i><h3>Receba a proposta</h3><p>Entraremos em contato pelo WhatsApp.</p></article>
+    </div>
+  </div>
+</section>
+
+<section id="vantagens">
+  <div class="container">
+    <div class="section-title"><span>POR QUE ESCOLHER A CellTech Panamby</span><h2>Segurança em todas as etapas</h2><p>Uma experiência simples, transparente e profissional.</p></div>
+
+    <div class="advantages">
+      <div><i class="fa-solid fa-store"></i><span>Loja física</span></div>
+      <div><i class="fa-brands fa-pix"></i><span>Pagamento via PIX</span></div>
+      <div><i class="fa-solid fa-file-circle-check"></i><span>Avaliação gratuita</span></div>
+      <div><i class="fa-solid fa-headset"></i><span>Atendimento especializado</span></div>
+      <div><i class="fa-solid fa-mobile-screen"></i><span>Compramos usados</span></div>
+      <div><i class="fa-solid fa-screwdriver-wrench"></i><span>Compramos com defeito</span></div>
+      <div><i class="fa-solid fa-bolt"></i><span>Atendimento rápido</span></div>
+      <div><i class="fa-solid fa-shield-halved"></i><span>Processo transparente</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="avaliacoes">
+  <div class="container">
+    <div class="section-title"><span>AVALIAÇÕES</span><h2>O que nossos clientes dizem</h2><p>Experiências de quem já vendeu para a CellTech Panamby.</p></div>
+
+    <div class="reviews">
+      <article class="review"><div class="stars">★★★★★</div><p>“Excelente atendimento. Avaliaram meu aparelho com rapidez e recebi o PIX na hora.”</p><strong>Carlos M.</strong></article>
+      <article class="review"><div class="stars">★★★★★</div><p>“Processo muito rápido, equipe educada e negociação transparente.”</p><strong>Amanda R.</strong></article>
+      <article class="review"><div class="stars">★★★★★</div><p>“Loja séria, atendimento profissional e avaliação justa.”</p><strong>João P.</strong></article>
+    </div>
+  </div>
+</section>
+
+<section class="store-section">
+  <div class="container store-grid">
+    <div>
+      <span>LOJA FÍSICA</span>
+      <h2>Atendimento presencial com mais segurança</h2>
+      <p>Após a análise online, a proposta é confirmada presencialmente após a conferência do aparelho.</p>
+
+      <div class="store-list">
+        <div><i class="fa-solid fa-location-dot"></i><span>Rua Itapaiúna, 2960 — Vila Andrade</span></div>
+        <div><i class="fa-solid fa-clock"></i><span>Segunda a sexta, das 10h às 20h</span></div>
+        <div><i class="fa-solid fa-calendar-day"></i><span>Sábado, das 10h às 14h</span></div>
+      </div>
+
+      <a href="https://maps.google.com/?q=Rua+Itapaiúna+2960+Vila+Andrade+São+Paulo" target="_blank" class="map-button">Como chegar <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+    </div>
+
+    <div class="store-visual">
+      <div class="store-pin"><i class="fa-solid fa-location-dot"></i><strong>CellTech Panamby</strong><span>Rua Itapaiúna, 2960</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="container">
+    <div class="section-title"><span>DÚVIDAS</span><h2>Perguntas frequentes</h2><p>Confira as principais informações.</p></div>
+
+    <div class="faq">
+      <article class="faq-item"><button type="button" class="faq-question">Vocês compram iPhone quebrado?<i class="fa-solid fa-chevron-down"></i></button><div class="faq-answer">Sim. Compramos aparelhos usados, quebrados e com defeitos.</div></article>
+      <article class="faq-item"><button type="button" class="faq-question">Quanto tempo demora?<i class="fa-solid fa-chevron-down"></i></button><div class="faq-answer">Após o envio, nossa equipe entra em contato rapidamente pelo WhatsApp.</div></article>
+      <article class="faq-item"><button type="button" class="faq-question">O pagamento é feito na hora?<i class="fa-solid fa-chevron-down"></i></button><div class="faq-answer">Sim. Após a conferência e aprovação, fazemos o pagamento via PIX.</div></article>
+      <article class="faq-item"><button type="button" class="faq-question">Preciso levar o aparelho até a loja?<i class="fa-solid fa-chevron-down"></i></button><div class="faq-answer">Sim. A proposta final é confirmada após a conferência presencial.</div></article>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container footer">
+    <div><a class="logo" href="#topo">CellTech <span>Panamby</span></a><p>Especialistas na compra e venda de iPhones.</p></div>
+    <div><h4>Navegação</h4><a href="#como">Como funciona</a><a href="#vantagens">Vantagens</a><a href="#avaliacoes">Avaliações</a><a href="#faq">Dúvidas</a></div>
+    <div><h4>Atendimento</h4><p>Segunda a sexta: 10h às 20h</p><p>Sábado: 10h às 14h</p><p>Rua Itapaiúna, 2960 — Vila Andrade</p></div>
+  </div>
+  <div class="copy">© 2026 CellTech Panamby — Todos os direitos reservados.</div>
+</footer>
+
+<script src="script.js"></script>
+
+<a class="floating-whatsapp" href="https://wa.me/5511977030517?text=Olá%2C%20vim%20pelo%20site%20da%20CellTech%20Panamby%20e%20gostaria%20de%20mais%20informações." target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+  <i class="fa-brands fa-whatsapp"></i>
+</a>
+
+</body>
+</html>
