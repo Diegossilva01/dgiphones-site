@@ -1,0 +1,274 @@
+/* Página exclusiva de cotação — versão compacta para celular */
+.quote-page{
+  background:#fff;
+  min-height:100vh;
+  color:#111;
+}
+
+.quote-minimal-header{
+  height:92px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-top:4px solid #f6b400;
+  background:#fff;
+}
+
+.quote-logo{
+  font-size:30px;
+  font-weight:900;
+  letter-spacing:-1.6px;
+  color:#111;
+}
+.quote-logo span{color:#f6b400}
+
+.quote-page #quote{
+  display:block;
+  padding:26px 0 70px;
+  background:#fff;
+}
+
+.quote-page .quote-container{max-width:820px}
+
+.quote-intro{
+  margin:0 0 20px;
+  text-align:left;
+}
+.quote-intro h1{
+  margin:0 0 6px;
+  font-size:clamp(32px,5vw,46px);
+  line-height:1.05;
+  letter-spacing:-1.8px;
+}
+.quote-intro p{
+  margin:0;
+  font-size:17px;
+  color:#707582;
+}
+
+.quote-page .progressBox{
+  padding:16px 0 18px;
+  margin-bottom:12px;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  background:#fff;
+}
+.quote-page .progressText{
+  margin-bottom:10px;
+  font-size:15px;
+  color:#697080;
+}
+.quote-page .progressText span:first-child{font-weight:600}
+.quote-page .progress{
+  height:6px;
+  border-radius:999px;
+  background:#e8eaee;
+}
+.quote-page .progressFill{
+  border-radius:999px;
+  background:#f6b400;
+}
+
+.quote-page .step{
+  padding:24px 0 10px;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  background:#fff;
+}
+
+.quote-page .step-header{margin-bottom:18px}
+.quote-page .step-header>span{
+  margin-bottom:6px;
+  color:#c99100;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.7px;
+}
+.quote-page .step h2{
+  margin-bottom:6px;
+  font-size:clamp(27px,4vw,36px);
+  line-height:1.12;
+  letter-spacing:-1.1px;
+}
+.quote-page .step-header p{
+  margin:0;
+  font-size:16px;
+  line-height:1.35;
+  color:#737986;
+}
+
+.quote-page .grid{gap:10px}
+.quote-page .compact-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.quote-page .two-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.quote-page .three-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.quote-page .option{
+  position:relative;
+  min-height:58px;
+  padding:12px 42px 12px 15px;
+  border:1.5px solid #dfe2e7;
+  border-radius:10px;
+  background:#fff;
+  color:#343841;
+  font-size:16px;
+  font-weight:600;
+  line-height:1.25;
+  justify-content:flex-start;
+  text-align:left;
+  box-shadow:none;
+  transform:none;
+  transition:border-color .16s ease,background-color .16s ease,color .16s ease,box-shadow .16s ease;
+}
+.quote-page .option:hover{
+  border-color:#d0a01c;
+  background:#fffaf0;
+  transform:none;
+}
+.quote-page .option.selected,
+.quote-page .multi-step .option.selected{
+  border-color:#f0b323;
+  background:#fff3c9;
+  color:#2f270d;
+  box-shadow:0 0 0 1px #f0b323;
+}
+.quote-page .option.selected::after{
+  content:'✓';
+  position:absolute;
+  right:14px;
+  top:50%;
+  width:23px;
+  height:23px;
+  display:grid;
+  place-items:center;
+  transform:translateY(-50%);
+  border-radius:50%;
+  background:#f6b400;
+  color:#111;
+  font-size:14px;
+  font-weight:900;
+}
+
+.quote-page .search-model{
+  height:54px;
+  margin-bottom:12px;
+  border-width:1.5px;
+  border-radius:10px;
+}
+.quote-page .search-model input{font-size:16px}
+.quote-page .model-grid{
+  max-height:330px;
+  padding-right:4px;
+  overflow-y:auto;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+.quote-page .continue-button{
+  display:block;
+  width:100%;
+  max-width:none;
+  height:56px;
+  margin:18px 0 0;
+  border:0;
+  border-radius:10px;
+  background:#111;
+  color:#fff;
+  font-size:17px;
+  font-weight:800;
+  box-shadow:0 10px 28px rgba(0,0,0,.16);
+}
+.quote-page .continue-button:hover{background:#111;color:#fff}
+.quote-page .continue-button:disabled{
+  background:#d8dbe0;
+  color:#fff;
+  box-shadow:none;
+  opacity:1;
+}
+
+.quote-minimal-footer{
+  padding:24px 20px 34px;
+  text-align:center;
+  color:#8a8f9c;
+  font-size:13px;
+  background:#fff;
+}
+.quote-page #loading,.quote-page #success{
+  min-height:calc(100vh - 92px);
+  padding:70px 0;
+  background:#fff;
+}
+
+@media(max-width:640px){
+  .quote-page{padding-bottom:0}
+  .quote-minimal-header{height:72px}
+  .quote-logo{font-size:25px}
+  .quote-page #quote{padding:10px 0 110px}
+  .quote-page .quote-container{width:min(100% - 36px,820px)}
+
+  .quote-intro{margin-bottom:8px}
+  .quote-intro h1{font-size:27px;letter-spacing:-1.1px}
+  .quote-intro p{font-size:14px;line-height:1.35}
+
+  .quote-page .progressBox{padding:12px 0 14px;margin-bottom:0}
+  .quote-page .progressText{font-size:14px;margin-bottom:8px}
+  .quote-page .progress{height:5px}
+
+  .quote-page .step{padding:15px 0 4px}
+  .quote-page .step-header{margin-bottom:14px}
+  .quote-page .step-header>span{font-size:11px;margin-bottom:4px}
+  .quote-page .step h2{font-size:28px;line-height:1.1;margin-bottom:5px}
+  .quote-page .step-header p{font-size:15px}
+
+  .quote-page .grid{gap:8px}
+  .quote-page .compact-grid,
+  .quote-page .two-grid,
+  .quote-page .three-grid{
+    grid-template-columns:1fr;
+  }
+
+  .quote-page .option{
+    min-height:54px;
+    padding:10px 42px 10px 14px;
+    border-radius:9px;
+    font-size:15px;
+  }
+
+  .quote-page .model-grid{
+    max-height:310px;
+    grid-template-columns:1fr;
+  }
+  .quote-page .search-model{height:50px;margin-bottom:9px}
+
+  /* O botão permanece sempre visível nas etapas de múltipla escolha. */
+  .quote-page .step.active .continue-button{
+    position:fixed;
+    z-index:1000;
+    left:18px;
+    right:18px;
+    bottom:calc(12px + env(safe-area-inset-bottom));
+    width:calc(100% - 36px);
+    height:56px;
+    margin:0;
+  }
+
+  .quote-page .multi-step{padding-bottom:78px}
+  .quote-minimal-footer{display:none}
+}
+
+@media(max-width:390px){
+  .quote-page .quote-container{width:min(100% - 28px,820px)}
+  .quote-page .step h2{font-size:26px}
+  .quote-page .option{min-height:51px;font-size:14px}
+  .quote-page .step.active .continue-button{
+    left:14px;
+    right:14px;
+    width:calc(100% - 28px);
+  }
+}
