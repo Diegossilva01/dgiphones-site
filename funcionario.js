@@ -30,12 +30,13 @@ async function logout(){try{await api("logout")}catch(e){}localStorage.removeIte
 
 $("#loginForm").addEventListener("submit",async e=>{e.preventDefault();const m=$("#loginMsg");m.textContent="Entrando...";try{const j=await api("login",{usuario:$("#loginUsuario").value,senha:$("#loginSenha").value});state.token=j.token;state.user=j.funcionario;localStorage.setItem("ct_token",state.token);showApp()}catch(err){m.textContent=err.message}});
 $("#logoutBtn").onclick=logout;$("#menuBtn").onclick=()=>$(".sidebar").classList.toggle("open");
-$$('.nav-btn').forEach(btn=>btn.onclick=()=>{if(btn.style.display==='none')return;$$('.nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');$$('.page').forEach(p=>p.classList.remove('active'));$(`#page-${btn.dataset.page}`).classList.add('active');$("#tituloPagina").textContent=btn.textContent.trim();$(".sidebar").classList.remove("open");if(btn.dataset.page==='historico')loadHistorico();if(btn.dataset.page==='dashboard')loadDashboard();if(btn.dataset.page==='venda')loadEstoque();if(btn.dataset.page==='comissao')loadComissao()});
+$$('.nav-btn').forEach(btn=>btn.onclick=()=>{if(btn.style.display==='none')return;$$('.nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');$$('.page').forEach(p=>p.classList.remove('active'));$(`#page-${btn.dataset.page}`).classList.add('active');$("#tituloPagina").textContent=btn.textContent.trim();$(".sidebar").classList.remove("open");if(btn.dataset.page==='historico')loadHistorico();if(btn.dataset.page==='dashboard')loadDashboard();if(btn.dataset.page==='venda')loadEstoque()});
 
 $$('.cpf').forEach(i=>i.addEventListener('input',()=>{let v=i.value.replace(/\D/g,'').slice(0,11);i.value=v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2')}));
 $$('.money').forEach(i=>i.addEventListener('blur',()=>{const v=parseMoney(i.value);if(v)i.value=money(v)}));
 $$('input[type=date]').forEach(i=>{if(!i.value)i.value=today()});
 
+async function loadEstoque(){const s=$("#estoqueSelect");try{const j=await api("listarEstoque",{status:"Disponível"});state.estoque=j.estoque;s.innerHTML='<option value="">Selecione o aparelho</option>'+j.estoque.map(r=>`<option value="${r['ID Estoque']}">${r['Modelo']} ${r['Armazenamento']||''} ${r['Cor']||''} • IMEI 1 ${r['IMEI']}${r['IMEI 2']?` • IMEI 2 ${r['IMEI 2']}`:''} • Custo ${money(r['Valor de custo'])}</option>`).join('')}catch(e){s.innerHTML='<option value="">Erro ao carregar estoque</option>'}}
 
 $("#compraForm").addEventListener("submit",async e=>{e.preventDefault();const f=e.currentTarget,d=formData(f),printar=f.querySelector('[name=gerarRecibo]').checked,win=printar?window.open("","_blank"):null;if(win)win.document.write("<p style=font-family:Arial;padding:30px>Gerando recibo...</p>");if(!validCPF(d.cpf)){if(win)win.close();return setMsg(f,"CPF inválido.")}if(String(d.imei).replace(/\D/g,'').length!==15){if(win)win.close();return setMsg(f,"O IMEI 1 deve ter 15 números.")}if(d.imei2&&String(d.imei2).replace(/\D/g,'').length!==15){if(win)win.close();return setMsg(f,"O IMEI 2 deve ter 15 números.")}d.valorCompra=parseMoney(d.valorCompra);if(d.valorCompra<=0){if(win)win.close();return setMsg(f,"Informe um valor válido.")}delete d.gerarRecibo;setMsg(f,"Salvando...");try{const j=await api("cadastrarCompra",d);if(printar)openReceipt(win,compraReceipt(d,j.idCompra));f.reset();f.querySelector('[name=dataCompra]').value=today();f.querySelector('[name=gerarRecibo]').checked=true;setMsg(f,"Compra salva e recibo gerado.",true);toast("Compra cadastrada");state.dados=null;loadEstoque();loadDashboard()}catch(err){if(win)win.close();setMsg(f,err.message)}});
 
@@ -85,7 +86,7 @@ async function loadDashboard(){
     state.chart=new Chart($("#salesChart"),{type:'bar',data:{labels:dias.map(x=>x.data),datasets:[{label:'Faturamento',data:dias.map(x=>x.valor)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
   }catch(e){toast(e.message)}
 }
-async function loadEstoque(){try{const j=await carregarDadosSistema(true);state.estoque=(j.estoque||[]).filter(x=>String(x['Status']||'').trim().toLowerCase()==='disponível');const s=$("#estoqueSelect");s.innerHTML='<option value="">Selecione o aparelho</option>'+state.estoque.map(x=>`<option value="${esc(x['ID Estoque'])}">${esc(`${x['Modelo']||''} ${x['Armazenamento']||''} ${x['Cor']||''} • IMEI ${x['IMEI']||''}`)}</option>`).join('')}catch(e){toast(e.message)}}
+async function loadEstoque(){try{const j=await carregarDadosSistema(true);state.estoque=(j.estoque||[]).filter(x=>String(x['Status']||'').trim().toLowerCase()==='disponível');const s=$("#vendaEstoque");s.innerHTML='<option value="">Selecione o aparelho</option>'+state.estoque.map(x=>`<option value="${esc(x['ID Estoque'])}">${esc(`${x['Modelo']||''} ${x['Armazenamento']||''} ${x['Cor']||''} • IMEI ${x['IMEI']||''}`)}</option>`).join('')}catch(e){toast(e.message)}}
 async function loadHistorico(){
   const body=$("#histBody"),head=$("#histHead"),tipo=$("#histTipo").value;
   body.innerHTML='<tr><td>Carregando...</td></tr>';$("#histMsg").textContent='';
@@ -106,44 +107,6 @@ async function loadHistorico(){
     if(!regs.length)body.innerHTML='<tr><td colspan="10">Nenhum registro encontrado.</td></tr>';
   }catch(e){body.innerHTML='';$("#histMsg").textContent=e.message}
 }
-
-
-function mesAtual(){return today().slice(0,7)}
-
-async function loadComissao(){
-  const mesEl=$("#comissaoMes"), body=$("#comissaoBody"), msg=$("#comissaoMsg");
-  if(!mesEl.value)mesEl.value=mesAtual();
-  const mes=mesEl.value;
-  body.innerHTML='<tr><td colspan="4">Calculando...</td></tr>';
-  msg.textContent='';
-  try{
-    const j=await carregarDadosSistema(true);
-    const vendas=(j.vendas||[]).filter(r=>chaveDia(r['Data da venda']).slice(0,7)===mes);
-    const faturamento=vendas.reduce((total,r)=>total+numeroPlanilha(r['Valor da venda']),0);
-    const comissao=faturamento*0.03;
-
-    $("#comissaoFaturamento").textContent=money(faturamento);
-    $("#comissaoValor").textContent=money(comissao);
-    $("#comissaoVendas").textContent=vendas.length;
-
-    const porFuncionario={};
-    vendas.forEach(r=>{
-      const nome=String(r['Funcionário responsável']||'Não informado').trim()||'Não informado';
-      if(!porFuncionario[nome])porFuncionario[nome]={quantidade:0,faturamento:0};
-      porFuncionario[nome].quantidade++;
-      porFuncionario[nome].faturamento+=numeroPlanilha(r['Valor da venda']);
-    });
-
-    const linhas=Object.entries(porFuncionario).sort((a,b)=>b[1].faturamento-a[1].faturamento);
-    body.innerHTML=linhas.length?linhas.map(([nome,dados])=>`<tr><td>${esc(nome)}</td><td>${dados.quantidade}</td><td>${money(dados.faturamento)}</td><td><strong>${money(dados.faturamento*0.03)}</strong></td></tr>`).join(''):'<tr><td colspan="4">Nenhuma venda encontrada neste mês.</td></tr>';
-  }catch(e){
-    body.innerHTML='<tr><td colspan="4">Não foi possível calcular.</td></tr>';
-    msg.textContent=e.message;
-  }
-}
-
-$("#buscarComissao").onclick=loadComissao;
-$("#comissaoMes").onchange=loadComissao;
 
 window.excluirRegistro=async(tipo,id)=>{const motivo=prompt('Informe o motivo da exclusão:');if(!motivo)return;try{await api(tipo==='venda'?'excluirVenda':'excluirCompra',tipo==='venda'?{idVenda:id,motivo}:{idCompra:id,motivo});toast('Registro excluído');state.dados=null;loadHistorico();loadEstoque();loadDashboard()}catch(e){toast(e.message)}};
 $("#buscarHistorico").onclick=loadHistorico;$("#histTipo").onchange=loadHistorico;

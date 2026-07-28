@@ -32,7 +32,6 @@
       <button class="nav-btn" data-page="venda"><i class="fa-solid fa-cart-shopping"></i> Nova venda</button>
       <button class="nav-btn" data-page="compra"><i class="fa-solid fa-mobile-screen"></i> Nova compra</button>
       <button class="nav-btn" data-page="historico"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</button>
-      <button class="nav-btn" data-page="comissao"><i class="fa-solid fa-percent"></i> Comissão</button>
       <button class="nav-btn admin-only" data-page="usuarios"><i class="fa-solid fa-users-gear"></i> Funcionários</button>
     </nav>
     <button id="logoutBtn" class="logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button>
@@ -108,39 +107,6 @@
         </div>
         <div class="table-wrap"><table><thead id="histHead"></thead><tbody id="histBody"></tbody></table></div>
         <p id="histMsg" class="message"></p>
-      </div>
-    </section>
-
-
-    <section id="page-comissao" class="page">
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <h2>Comissão mensal</h2>
-            <p class="commission-note">A comissão corresponde a 3% do faturamento das vendas no mês selecionado.</p>
-          </div>
-          <button id="buscarComissao" class="secondary">Calcular</button>
-        </div>
-        <div class="filters commission-filter">
-          <label>Mês de referência<input id="comissaoMes" type="month"></label>
-        </div>
-      </div>
-
-      <div class="cards commission-cards">
-        <article><span>Faturamento no mês</span><strong id="comissaoFaturamento">R$ 0,00</strong></article>
-        <article><span>Comissão de 3%</span><strong id="comissaoValor">R$ 0,00</strong></article>
-        <article><span>Vendas no mês</span><strong id="comissaoVendas">0</strong></article>
-      </div>
-
-      <div class="panel">
-        <h2>Comissão por funcionário</h2>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Funcionário</th><th>Vendas</th><th>Faturamento</th><th>Comissão (3%)</th></tr></thead>
-            <tbody id="comissaoBody"><tr><td colspan="4">Selecione o mês para calcular.</td></tr></tbody>
-          </table>
-        </div>
-        <p id="comissaoMsg" class="message"></p>
       </div>
     </section>
 
