@@ -1,0 +1,11 @@
+ATUALIZAÇÃO DO SISTEMA
+
+1. No Google Apps Script da planilha Sistema interno, substitua o código antigo pelo arquivo SistemaInternoAtualizado.gs.
+2. Salve.
+3. Execute a função configurarSistema uma vez. Ela preserva os dados e adiciona a coluna IMEI 2.
+4. Vá em Implantar > Gerenciar implantações > Editar.
+5. Em Versão, escolha Nova versão e clique em Implantar.
+6. No GitHub, substitua funcionario.html e funcionario.js pelos arquivos deste projeto.
+7. Aguarde o Vercel atualizar e pressione Ctrl + F5.
+
+A correção resolve o histórico vazio e adiciona IMEI 1 e IMEI 2 em compras, estoque, vendas e recibos.
