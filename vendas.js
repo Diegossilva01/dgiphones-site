@@ -20,12 +20,12 @@ function enhance(){
     if(!priceEl)return;
     const pix=parsePrice(priceEl.textContent);
     if(!Number.isFinite(pix))return;
-    const cardPrice=pix*1.12;
+    const cardPrice=pix*1.14;
     const installment=cardPrice/12;
     (priceEl.closest("p")||priceEl).classList.add("preco-original");
     const box=document.createElement("div");
     box.className="pricing-box";
-    box.innerHTML=`<span>Preço no cartão</span><div class="card-price">${money(cardPrice)}</div><div class="installment">ou 12x de ${money(installment)} sem juros</div><div class="pix-row"><span class="pix-badge">10% OFF</span><span class="pix-price">${money(pix)}</span><span>no PIX</span></div>`;
+    box.innerHTML=`<span>Preço no cartão</span><div class="card-price">${money(cardPrice)}</div><div class="installment">ou 12x de ${money(installment)} sem juros</div><div class="pix-row"><span class="pix-badge">14% OFF</span><span class="pix-price">${money(pix)}</span><span>no PIX</span></div>`;
     const info=card.querySelector(".info")||card;
     const whatsapp=info.querySelector(".whatsapp");
     if(whatsapp){info.insertBefore(box,whatsapp);whatsapp.innerHTML='<i class="fa-brands fa-whatsapp"></i> Comprar pelo WhatsApp'}else info.appendChild(box);
