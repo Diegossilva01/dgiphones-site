@@ -7,7 +7,7 @@ const money=v=>Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"B
 const today=()=>new Date().toISOString().slice(0,10);
 
 async function api(action,data={}){
-  if(SISTEMA_API_URL.includes("COLE_AQUI")) throw new Error("Configure a URL do Google Apps Script no arquivo funcionario.js.");
+  if(SISTEMA_API_URL.includes("https://script.google.com/macros/s/AKfycbzuAvirygI5_NanIKnxua2Aep5gFPGRgUUvdl9VOA3j2dtjloUr_W0SAUu0TcojsHbV/exec")) throw new Error("Configure a URL do Google Apps Script no arquivo funcionario.js.");
   const r=await fetch(SISTEMA_API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,token:state.token,...data})});
   const j=await r.json(); if(!j.success) throw new Error(j.message||"Não foi possível concluir."); return j;
 }
