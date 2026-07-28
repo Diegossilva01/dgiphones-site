@@ -1,5 +1,5 @@
 // COLE A URL DA NOVA IMPLANTAÇÃO DO GOOGLE APPS SCRIPT AQUI.
-const SISTEMA_API_URL = "COLE_AQUI_A_URL_DO_GOOGLE_APPS_SCRIPT";
+const SISTEMA_API_URL = "https://script.google.com/macros/s/AKfycbzuAvirygI5_NanIKnxua2Aep5gFPGRgUUvdl9VOA3j2dtjloUr_W0SAUu0TcojsHbV/exec";
 
 const state={token:localStorage.getItem("ct_token")||"",user:null,chart:null};
 const $=s=>document.querySelector(s); const $$=s=>document.querySelectorAll(s);
