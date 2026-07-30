@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CellTech Panamby | Sistema Interno</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="./funcionario.css?v=20260730-10">
+</head>
+<body>
+<section id="loginScreen" class="login-screen">
+  <button id="loginThemeToggle" class="theme-toggle login-theme-toggle" type="button" aria-label="Alternar tema" title="Alternar tema"><i class="fa-solid fa-moon"></i></button>
+  <form id="loginForm" class="login-card">
+    <div class="brand">CellTech <span>Panamby</span></div>
+    <h1>Área de acesso</h1>
+    <p>Entre com seu usuário para acessar o sistema.</p>
+    <label>Usuário<input id="loginUsuario" autocomplete="username" required></label>
+    <label>Senha<input id="loginSenha" type="password" autocomplete="current-password" required></label>
+    <button class="primary" type="submit"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
+    <small id="loginMsg" class="message"></small>
+  </form>
+</section>
+
+<div id="app" class="app hidden">
+  <aside class="sidebar">
+    <div class="brand">CellTech <span>Panamby</span></div>
+    <nav>
+      <button class="nav-btn active" data-page="dashboard"><i class="fa-solid fa-chart-line"></i> Dashboard</button>
+      <button class="nav-btn" data-page="venda"><i class="fa-solid fa-cart-shopping"></i> Nova venda</button>
+      <button class="nav-btn" data-page="compra"><i class="fa-solid fa-mobile-screen"></i> Nova compra</button>
+      <button class="nav-btn" data-page="historico"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</button>
+      <button class="nav-btn" data-page="site"><i class="fa-solid fa-globe"></i> Produtos no site</button>
+      <button class="nav-btn" data-page="comissao"><i class="fa-solid fa-percent"></i> Comissão</button>
+      <button class="nav-btn admin-only" data-page="usuarios"><i class="fa-solid fa-users-gear"></i> Usuários</button>
+      <button class="nav-btn reseller-only" data-page="revendedor" style="display:none"><i class="fa-solid fa-tags"></i> Catálogo de revenda</button>
+    </nav>
+    <button id="logoutBtn" class="logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <button id="menuBtn" class="menu-btn"><i class="fa-solid fa-bars"></i></button>
+      <div><strong id="tituloPagina">Dashboard</strong><span id="usuarioLogado"></span></div>
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Alternar tema" title="Alternar entre tema claro e escuro"><i class="fa-solid fa-moon"></i><span>Tema escuro</span></button>
+    </header>
+
+    <section id="page-dashboard" class="page active">
+      <div class="dashboard-intro"><div><span class="eyebrow">Visão geral</span><h1>Resumo do negócio</h1><p>Acompanhe vendas, estoque e rentabilidade em um só lugar.</p></div></div>
+      <div class="cards dashboard-cards">
+        <article class="kpi kpi-blue"><div class="kpi-icon"><i class="fa-solid fa-bolt"></i></div><span>Faturamento hoje</span><strong id="kpiFaturamentoHoje">R$ 0,00</strong><small>Movimentação do dia</small></article>
+        <article class="kpi kpi-violet"><div class="kpi-icon"><i class="fa-solid fa-calendar-days"></i></div><span>Faturamento no mês</span><strong id="kpiFaturamentoMes">R$ 0,00</strong><small>Total do mês atual</small></article>
+        <article class="kpi kpi-cyan"><div class="kpi-icon"><i class="fa-solid fa-cart-shopping"></i></div><span>Vendas no mês</span><strong id="kpiVendasMes">0</strong><small>Negócios concluídos</small></article>
+        <article class="kpi kpi-amber"><div class="kpi-icon"><i class="fa-solid fa-tag"></i></div><span>Ticket médio</span><strong id="kpiTicket">R$ 0,00</strong><small>Média por venda</small></article>
+        <article class="kpi kpi-emerald"><div class="kpi-icon"><i class="fa-solid fa-arrow-trend-up"></i></div><span>Lucro no mês</span><strong id="kpiLucroMes">R$ 0,00</strong><small>Resultado mensal</small></article>
+        <article class="kpi kpi-orange"><div class="kpi-icon"><i class="fa-solid fa-mobile-screen-button"></i></div><span>Aparelhos disponíveis</span><strong id="kpiEstoque">0</strong><small>Unidades em estoque</small></article>
+        <article class="kpi kpi-blue"><div class="kpi-icon"><i class="fa-solid fa-vault"></i></div><span>Investimento em estoque</span><strong id="kpiCustoEstoque">R$ 0,00</strong><small>Total pago nos aparelhos</small></article>
+        <article class="kpi kpi-violet"><div class="kpi-icon"><i class="fa-solid fa-bag-shopping"></i></div><span>Valor de venda do estoque</span><strong id="kpiVendaEstoque">R$ 0,00</strong><small>Potencial de faturamento</small></article>
+        <article class="kpi kpi-emerald"><div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div><span>Lucro potencial</span><strong id="kpiLucroPotencial">R$ 0,00</strong><small>Ao vender todo o estoque</small></article>
+        <article class="kpi kpi-amber"><div class="kpi-icon"><i class="fa-solid fa-chart-pie"></i></div><span>Margem média</span><strong id="kpiMargemMedia">0%</strong><small>Rentabilidade média</small></article>
+      </div>
+      <div class="panel"><h2>Faturamento dos últimos 30 dias</h2><div class="chart-wrap"><canvas id="salesChart"></canvas></div></div>
+    </section>
+
+    <section id="page-venda" class="page">
+      <div class="panel form-panel">
+        <h2>Cadastrar venda</h2>
+        <form id="vendaForm" class="grid-form">
+          <label>Nome do cliente<input name="nome" required maxlength="120"></label>
+          <label>CPF<input name="cpf" class="cpf" inputmode="numeric" required maxlength="14"></label>
+          <label>Telefone<input name="telefone" inputmode="tel" maxlength="20"></label>
+          <label>Data da venda<input name="dataVenda" type="date" required></label>
+          <label class="full">Aparelho do estoque<select name="idEstoque" id="estoqueSelect" required><option value="">Carregando estoque...</option></select></label>
+          <label>Forma de pagamento<select name="formaPagamento" required><option value="">Selecione</option><option>PIX</option><option>Dinheiro</option><option>Cartão de débito</option><option>Cartão de crédito</option><option>Transferência</option><option>Outro</option></select></label>
+          <label>Valor da venda<input name="valorVenda" class="money" inputmode="decimal" required></label>
+          <label>Garantia da loja (dias)<input name="garantiaDias" type="number" min="0" max="3650" value="90" required></label>
+          <label class="full">Observações<textarea name="observacoes" rows="3" maxlength="500"></textarea></label>
+          <label class="full receipt-option"><input name="gerarRecibo" type="checkbox" checked> Gerar e imprimir recibo após salvar</label>
+          <div class="full actions"><button class="primary" type="submit">Salvar venda e gerar recibo</button><span class="message form-message"></span></div>
+        </form>
+      </div>
+    </section>
+
+    <section id="page-compra" class="page">
+      <div class="panel form-panel">
+        <h2>Cadastrar celular comprado</h2>
+        <form id="compraForm" class="grid-form">
+          <label>Nome de quem vendeu<input name="nome" required maxlength="120"></label>
+          <label>CPF<input name="cpf" class="cpf" inputmode="numeric" required maxlength="14"></label>
+          <label>Telefone<input name="telefone" inputmode="tel" maxlength="20"></label>
+          <label>Data da compra<input name="dataCompra" type="date" required></label>
+          <label>Modelo<input name="modelo" required maxlength="120"></label>
+          <label>Armazenamento<input name="armazenamento" placeholder="Ex.: 128 GB"></label>
+          <label>Cor<input name="cor"></label>
+          <label>IMEI 1<input name="imei" inputmode="numeric" required maxlength="15"></label>
+          <label>IMEI 2<input name="imei2" inputmode="numeric" maxlength="15" placeholder="Opcional"></label>
+          <label>Valor da compra<input name="valorCompra" class="money" inputmode="decimal" required></label>
+          <label>Preço de venda no PIX<input name="precoSite" class="money" inputmode="decimal" required></label>
+          <label>Preço para revendedor<input name="precoRevenda" class="money" inputmode="decimal" required></label>
+          <label>Categoria<select name="categoriaSite"><option value="iPhone">iPhone</option><option value="iPad">iPad</option><option value="MacBook">MacBook</option><option value="Apple Watch">Apple Watch</option><option value="Acessório">Acessório</option></select></label>
+          <label>Condição<input name="condicaoSite" value="Seminovo" maxlength="60"></label>
+          <label>Saúde da bateria<input name="bateriaSite" placeholder="Ex.: 89%" maxlength="20"></label>
+          <label>Publicação<select name="statusSite"><option value="Publicado">Publicar no site</option><option value="Oculto">Cadastrar oculto</option><option value="Reservado">Reservado</option></select></label>
+          <label class="full">Comentário exclusivo para revendedores<textarea name="comentarioRevendedor" rows="3" maxlength="600" placeholder="Ex.: Tela original substituída, bateria trocada ou pequeno detalhe estético. Deixe vazio quando não houver observações."></textarea><small class="field-help">Este texto não aparece no site público. Ele será exibido somente no catálogo dos revendedores.</small></label>
+          <label class="full">Fotos do produto<input name="fotosProduto" type="file" accept="image/*" multiple required><small class="field-help">Selecione de 1 a 6 fotos. A primeira será a foto principal e todas serão salvas no Google Drive.</small></label>
+          <label>Forma de pagamento<select name="formaPagamento"><option value="">Selecione</option><option>PIX</option><option>Dinheiro</option><option>Transferência</option><option>Outro</option></select></label>
+          <label class="full">Observações<textarea name="observacoes" rows="3" maxlength="500"></textarea></label>
+          <label class="full receipt-option"><input name="gerarRecibo" type="checkbox" checked> Gerar e imprimir recibo após salvar</label>
+          <div class="full actions"><button class="primary" type="submit">Salvar compra e gerar recibo</button><span class="message form-message"></span></div>
+        </form>
+      </div>
+    </section>
+
+    <section id="page-site" class="page">
+      <div class="panel">
+        <div class="panel-head"><div><h2>Produtos no site</h2><p class="commission-note">Controle quais aparelhos aparecem na página pública.</p></div><button id="atualizarSiteProdutos" class="secondary">Atualizar</button></div>
+        <div class="table-wrap products-table-wrap"><table class="products-table"><thead><tr><th>Foto</th><th>Produto</th><th class="col-price">Preço PIX</th><th class="col-resale">Preço revenda</th><th class="col-cost">Custo</th><th class="col-profit">Lucro</th><th class="col-margin">Margem</th><th>Status</th><th class="col-actions">Ações</th></tr></thead><tbody id="siteProdutosBody"><tr><td colspan="9">Carregando...</td></tr></tbody></table></div>
+        <p id="siteProdutosMsg" class="message"></p>
+      </div>
+    </section>
+
+    <section id="page-historico" class="page">
+      <div class="panel">
+        <div class="panel-head"><h2>Histórico</h2><button id="buscarHistorico" class="secondary">Buscar</button></div>
+        <div class="filters">
+          <label>Tipo<select id="histTipo"><option value="vendas">Vendas</option><option value="compras">Compras</option></select></label>
+          <label>De<input id="histInicio" type="date"></label>
+          <label>Até<input id="histFim" type="date"></label>
+          <label>Pesquisa<input id="histBusca" placeholder="Nome, CPF, modelo ou IMEI"></label>
+        </div>
+        <div class="table-wrap"><table><thead id="histHead"></thead><tbody id="histBody"></tbody></table></div>
+        <p id="histMsg" class="message"></p>
+      </div>
+    </section>
+
+
+    <section id="page-comissao" class="page">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Comissão mensal</h2>
+            <p class="commission-note">A comissão corresponde a 3% do faturamento das vendas no mês selecionado.</p>
+          </div>
+          <button id="buscarComissao" class="secondary">Calcular</button>
+        </div>
+        <div class="filters commission-filter">
+          <label>Mês de referência<input id="comissaoMes" type="month"></label>
+        </div>
+      </div>
+
+      <div class="cards commission-cards">
+        <article><span>Faturamento no mês</span><strong id="comissaoFaturamento">R$ 0,00</strong></article>
+        <article><span>Comissão de 3%</span><strong id="comissaoValor">R$ 0,00</strong></article>
+        <article><span>Vendas no mês</span><strong id="comissaoVendas">0</strong></article>
+      </div>
+
+      <div class="panel">
+        <h2>Comissão por funcionário</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Funcionário</th><th>Vendas</th><th>Faturamento</th><th>Comissão (3%)</th></tr></thead>
+            <tbody id="comissaoBody"><tr><td colspan="4">Selecione o mês para calcular.</td></tr></tbody>
+          </table>
+        </div>
+        <p id="comissaoMsg" class="message"></p>
+      </div>
+    </section>
+
+
+    <section id="page-revendedor" class="page reseller-only">
+      <div class="reseller-hero">
+        <div><span>PARCERIA PARA QUEM QUER LUCRAR</span><h1>Catálogo exclusivo para revendedores</h1><p>Aparelhos selecionados, valores especiais e informações transparentes para você comprar com segurança e aumentar sua margem.</p></div>
+        <div class="reseller-hero-badge"><i class="fa-solid fa-handshake"></i><strong>Condições exclusivas</strong><small>Preço especial para parceiros</small></div>
+      </div>
+      <div class="reseller-highlight-strip">
+        <div><i class="fa-solid fa-circle-check"></i><span><strong>Estoque real</strong><small>Somente aparelhos disponíveis</small></span></div>
+        <div><i class="fa-solid fa-camera"></i><span><strong>Fotos reais</strong><small>Veja o produto antes de comprar</small></span></div>
+        <div><i class="fa-solid fa-bolt"></i><span><strong>Atendimento rápido</strong><small>Negociação direta pelo WhatsApp</small></span></div>
+      </div>
+      <div class="reseller-benefits">
+        <article><i class="fa-solid fa-shield-halved"></i><div><strong>Procedência e transparência</strong><p>Informamos o estado do aparelho e qualquer peça substituída antes da compra.</p></div></article>
+        <article><i class="fa-solid fa-tags"></i><div><strong>Preços abaixo do mercado</strong><p>Compare o valor do site com o preço exclusivo e veja sua oportunidade de margem.</p></div></article>
+        <article><i class="fa-solid fa-mobile-screen-button"></i><div><strong>Aparelhos selecionados</strong><p>Produtos avaliados e apresentados com fotos reais e informações completas.</p></div></article>
+        <article><i class="fa-solid fa-arrows-rotate"></i><div><strong>Estoque sempre atualizado</strong><p>Novas oportunidades entram no catálogo conforme os aparelhos ficam disponíveis.</p></div></article>
+      </div>
+      <div class="reseller-section-head"><div><span>OPORTUNIDADES DISPONÍVEIS</span><h2>Escolha os produtos para sua revenda</h2></div><p>Os valores em verde são exclusivos para parceiros cadastrados.</p></div>
+      <div class="reseller-toolbar">
+        <div class="reseller-search"><i class="fa-solid fa-magnifying-glass"></i><input id="buscaModeloRevendedor" type="search" placeholder="Pesquisar modelo, armazenamento ou cor"><button id="limparBuscaRevendedor" type="button" aria-label="Limpar busca"><i class="fa-solid fa-xmark"></i></button></div>
+        <div class="reseller-filters">
+          <select id="ordemRevendedor" aria-label="Ordenar produtos"><option value="recentes">Mais recentes</option><option value="menor">Menor preço</option><option value="maior-desconto">Maior desconto</option><option value="modelo">Modelo A–Z</option></select>
+        </div>
+      </div>
+      <div class="reseller-results"><strong id="contadorRevendedor">0 produtos</strong><span>Estoque atualizado para parceiros</span></div>
+      <div id="revendedorCatalogo" class="reseller-grid"><div class="panel">Carregando produtos...</div></div>
+      <section class="reseller-how">
+        <div class="reseller-how-head"><span>COMPRA SIMPLES E SEGURA</span><h2>Como funciona para o revendedor</h2><p>Escolha o aparelho, confira todas as informações e fale direto com nossa equipe.</p></div>
+        <div class="reseller-steps">
+          <article><b>1</b><div><strong>Escolha o aparelho</strong><p>Use a busca e compare os preços disponíveis.</p></div></article>
+          <article><b>2</b><div><strong>Confira os detalhes</strong><p>Veja fotos, bateria, condição e observações importantes.</p></div></article>
+          <article><b>3</b><div><strong>Chame no WhatsApp</strong><p>O produto e o valor já seguem preenchidos na mensagem.</p></div></article>
+        </div>
+      </section>
+      <div class="reseller-trust">
+        <div class="reseller-trust-icon"><i class="fa-solid fa-shield-heart"></i></div>
+        <div><span>NOSSO COMPROMISSO</span><strong>Compra clara, sem surpresa.</strong><p>Qualquer troca de peça ou detalhe importante aparece destacado no próprio anúncio antes da negociação.</p></div>
+        <div class="reseller-trust-seal"><i class="fa-solid fa-award"></i><small>Parceiro<br>DG iPhones</small></div>
+      </div>
+      <p id="revendedorMsg" class="message"></p>
+    </section>
+
+    <section id="page-usuarios" class="page admin-only">
+      <div class="panel form-panel">
+        <h2>Cadastrar funcionário</h2>
+        <form id="usuarioForm" class="grid-form">
+          <label>Nome<input name="nome" required></label>
+          <label>Usuário<input name="usuario" required></label>
+          <label>Senha<input name="senha" type="password" minlength="6" required></label>
+          <label>Perfil<select name="perfil"><option value="Funcionário">Funcionário</option><option value="Revendedor">Revendedor</option><option value="Administrador">Administrador</option></select></label>
+          <label>Status<select name="status"><option value="Ativo">Ativo</option><option value="Inativo">Inativo</option></select></label>
+          <div class="full actions"><button class="primary">Cadastrar funcionário</button><span class="message form-message"></span></div>
+        </form>
+      </div>
+      <div class="panel table-panel users-list-panel">
+        <div class="panel-head"><h2>Funcionários cadastrados</h2><button type="button" class="secondary" id="atualizarFuncionarios"><i class="fa-solid fa-rotate"></i> Atualizar</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Nome</th><th>Usuário</th><th>Perfil</th><th>Status</th><th>Cadastro</th><th>Ações</th></tr></thead><tbody id="funcionariosBody"><tr><td colspan="6">Carregando...</td></tr></tbody></table></div>
+        <p id="funcionariosMsg" class="message"></p>
+      </div>
+    </section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="funcionario.js?v=20260730-11"></script>
+</body>
+</html>
