@@ -12,7 +12,7 @@ let currentStep = 0;
 const totalSteps = steps.length;
 const answers = {};
 
-const WHATSAPP_COTACAO = "5511977030517";
+const WHATSAPP_COTACAO = "5511960688383";
 const COTACAO_API_URL = "https://script.google.com/macros/s/AKfycbzuAvirygI5_NanIKnxua2Aep5gFPGRgUUvdl9VOA3j2dtjloUr_W0SAUu0TcojsHbV/exec";
 const COTACOES_LOCAL_KEY = "celltech_cotacoes_enviadas";
 
