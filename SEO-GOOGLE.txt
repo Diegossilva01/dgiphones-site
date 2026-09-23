@@ -1,0 +1,18 @@
+SEO GOOGLE — CELLTECH PANAMBY
+
+Domínio configurado: https://www.celltechpanamby.com.br
+
+Páginas principais para indexação:
+1. Venda seu iPhone: https://www.celltechpanamby.com.br/
+2. Comprar iPhone: https://www.celltechpanamby.com.br/vendas.html
+3. Manutenção de iPhone: https://www.celltechpanamby.com.br/manutencao.html
+
+Sitemap:
+https://www.celltechpanamby.com.br/sitemap.xml
+
+Depois de publicar o projeto na Vercel:
+- Abra o Google Search Console.
+- Envie sitemap.xml em Sitemaps.
+- Inspecione cada uma das três URLs e clique em Solicitar indexação.
+
+As páginas cotacao.html, acompanhamento.html e funcionario.html foram marcadas como noindex para não concorrerem com as páginas principais.

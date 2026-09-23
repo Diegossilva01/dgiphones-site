@@ -1,0 +1,15 @@
+INTEGRAÇÃO DA MANUTENÇÃO COM GOOGLE PLANILHAS
+
+O arquivo Code.gs deste projeto já foi atualizado.
+
+Para a gravação dos pedidos de manutenção funcionar no site publicado:
+1. Abra o Google Apps Script usado atualmente pelo site da CellTech Panamby.
+2. Substitua o Code.gs atual pelo Code.gs deste projeto.
+3. Clique em Implantar > Gerenciar implantações > Editar.
+4. Selecione "Nova versão" e clique em Implantar.
+
+Não é necessário criar a aba manualmente.
+No primeiro pedido o sistema cria automaticamente a aba "ManutencoesSite" com:
+ID, data/hora, WhatsApp, modelo, reparos, detalhes, origem do tráfego, página, dispositivo e status.
+
+A URL do Web App foi mantida igual à que o site já utiliza.
