@@ -1,9 +1,11 @@
-const CONFIG={TIMEZONE:'America/Sao_Paulo',TOKEN_HORAS:8,COMISSAO_PERCENTUAL:0.02,ABAS:{FUNCIONARIOS:'Funcionarios',COMPRAS:'Compras',ESTOQUE:'Estoque',VENDAS:'Vendas',LOG:'LogExclusoes',COTACOES:'CotacoesSite',MANUTENCOES:'ManutencoesSite',PAGAMENTOS:'PagamentosEquipe',VALES:'ValeSolicitacoes'}};
+const CONFIG={TIMEZONE:'America/Sao_Paulo',TOKEN_HORAS:8,COMISSAO_PERCENTUAL:0.02,ABAS:{FUNCIONARIOS:'Funcionarios',COMPRAS:'Compras',ESTOQUE:'Estoque',VENDAS:'Vendas',NOTAS_PRODUTO:'RecibosAcessorios',LOG:'LogExclusoes',COTACOES:'CotacoesSite',MANUTENCOES:'ManutencoesSite',PAGAMENTOS:'PagamentosEquipe',VALES:'ValeSolicitacoes'}};
+const OS_HEADERS_=['ID OS','Data da OS','Data de cadastro','Nome do cliente','CPF','Telefone','Aparelho / produto','Descrição do serviço','Valor','Custo da peça / serviço','Forma de pagamento','Observações','Funcionário responsável','ID Funcionário','Status','Status atualizado por','Status atualizado em','Custo atualizado por','Custo atualizado em','Chave pública'];
+const OS_STATUS_=['Recebido','Em manutenção','Aguardando peça','Pronto para retirada','Entregue'];
 
 const ACOES_EXIGEM_CONFIRMACAO_SENHA_=[
   'cadastrarCompra','excluirCompra','editarCompra',
   'atualizarProdutoSite','excluirProdutoSite',
-  'cadastrarVenda','excluirVenda','editarVenda',
+  'cadastrarVenda','excluirVenda','editarVenda','cadastrarNotaProduto','cadastrarOS',
   'cadastrarFuncionario','excluirFuncionario','removerFuncionario','deletarFuncionario',
   'salvarMeuPix','alterarStatusComissaoVenda','registrarPagamentoEquipe',
   'solicitarVale','alterarStatusVale','cadastrarRevendedor'
@@ -15,6 +17,8 @@ function configurarSistema(){
   criarAba_(ss,CONFIG.ABAS.COMPRAS,['ID Compra','Data da compra','Data de cadastro','Nome do vendedor','CPF','Telefone','Modelo','Armazenamento','Cor','IMEI','IMEI 2','Valor da compra','Forma de pagamento','Observações','Funcionário responsável','ID Funcionário']);
   criarAba_(ss,CONFIG.ABAS.ESTOQUE,['ID Estoque','ID Compra','Data de entrada','Modelo','Armazenamento','Cor','IMEI','IMEI 2','Valor de custo','Status','ID Venda','Data da venda','Funcionário responsável','Preço site','Categoria site','Condição site','Bateria site','Status site','Foto URL','Foto ID','Fotos URLs','Fotos IDs','Preço revenda','Comentário revendedor']);
   criarAba_(ss,CONFIG.ABAS.VENDAS,['ID Venda','Data da venda','Data de cadastro','Nome do cliente','CPF','Telefone','ID Estoque','Modelo','Armazenamento','Cor','IMEI','IMEI 2','Valor de custo','Valor da venda','Lucro','Forma de pagamento','Observações','Funcionário responsável','ID Funcionário','Status comissão','Comissão atualizada por','Comissão atualizada em']);
+  criarAba_(ss,CONFIG.ABAS.NOTAS_PRODUTO,['ID Nota','Data da venda','Data de cadastro','Nome do cliente','CPF','Telefone','Acessório vendido','Quantidade','Valor total','Forma de pagamento','Garantia (dias)','Observações','Funcionário responsável','ID Funcionário']);
+  abaOS_();
   criarAba_(ss,CONFIG.ABAS.LOG,['ID Log','Data e hora','Tipo de registro','ID do registro','Motivo','Funcionário responsável','ID Funcionário','Dados removidos']);
   criarAba_(ss,CONFIG.ABAS.COTACOES,['ID Cotação','Data e hora','Nome','WhatsApp','Modelo','Armazenamento','Cor','Liga normalmente','Tela','Traseira','Saúde da bateria','Peças trocadas','UTM Source','UTM Medium','UTM Campaign','GCLID','FBCLID','Página','Dispositivo','E-mail enviado','E-mail destino']);
   criarAba_(ss,CONFIG.ABAS.MANUTENCOES,['ID Manutenção','Data e hora','WhatsApp','Modelo','Reparos','Detalhes','UTM Source','UTM Medium','UTM Campaign','GCLID','FBCLID','Página','Dispositivo','Status']);
@@ -28,7 +32,13 @@ function configurarSistema(){
   formatar_();
 }
 
-function doGet(e){if(e&&e.parameter&&e.parameter.acao==='produtosSite')return produtosPublicos_();return json_({sucesso:true,sistema:'DGIPHONES - Sistema Interno',status:'online',dataHora:fmtDH_(new Date())})}
+function doGet(e){
+  try{
+    if(e&&e.parameter&&e.parameter.acao==='produtosSite')return produtosPublicos_();
+    if(e&&e.parameter&&e.parameter.acao==='acompanharOS')return json_(acompanharOS_(e.parameter));
+    return json_({sucesso:true,sistema:'DGIPHONES - Sistema Interno',status:'online',dataHora:fmtDH_(new Date())});
+  }catch(err){return json_({sucesso:false,mensagem:String(err.message||err)})}
+}
 function doPost(e){
   try{
     const d=JSON.parse((e&&e.postData&&e.postData.contents)||'{}');
@@ -56,6 +66,11 @@ function doPost(e){
       case 'atualizarProdutoSite':r=atualizarProdutoSite_(d);break;
       case 'excluirProdutoSite':r=excluirProdutoSite_(d);break;
       case 'cadastrarVenda':r=cadastrarVenda_(d);break;
+      case 'cadastrarNotaProduto':r=cadastrarNotaProduto_(d);break;
+      case 'cadastrarOS':r=cadastrarOS_(d);break;
+      case 'listarOS':r=listarOS_(d);break;
+      case 'alterarStatusOS':r=alterarStatusOS_(d);break;
+      case 'atualizarCustoOS':r=atualizarCustoOS_(d);break;
       case 'listarVendas':r=listarVendas_(d);break;
       case 'excluirVenda':r=excluirVenda_(d);break;
       case 'editarVenda':r=editarVenda_(d);break;
@@ -261,6 +276,7 @@ function cadastrarCompra_(d){
     const fotos=salvarFotosProduto_(d.fotosData,d.fotosNomes,d.fotoData,d.fotoNome,idEstoque);
     const principal=fotos[0]||{url:'',id:''};
     aba_(CONFIG.ABAS.ESTOQUE).appendRow([idEstoque,idCompra,data,txt_(d.modelo),txt_(d.armazenamento),txt_(d.cor),imei,imei2,valor,'Disponível','','',u.nome,num_(d.precoSite),txt_(d.categoriaSite)||'iPhone',txt_(d.condicaoSite)||'Seminovo',txt_(d.bateriaSite),['Publicado','Oculto','Reservado'].includes(txt_(d.statusSite))?txt_(d.statusSite):'Oculto',principal.url,principal.id,JSON.stringify(fotos.map(f=>f.url)),JSON.stringify(fotos.map(f=>f.id)),num_(d.precoRevenda),txt_(d.comentarioRevendedor)]);
+    limparCacheCatalogo_();
     return{sucesso:true,idCompra,idEstoque,mensagem:'Compra cadastrada.'};
   }finally{lock.releaseLock()}
 }
@@ -278,6 +294,7 @@ function excluirProdutoSite_(d){
     excluirFotosProduto_(vals[i][21]||vals[i][19]);
     sh.deleteRow(i+1);
     log_('Produto do site',idEstoque,motivo,u,removido);
+    limparCacheCatalogo_();
     return{sucesso:true,mensagem:'Produto excluído do estoque e do site.'};
   }
   throw new Error('Produto não encontrado.');
@@ -292,7 +309,131 @@ function cadastrarVenda_(d){
   const idVenda=id_('VENDA'),custo=Number(a[8])||0,lucro=valor-custo;
   aba_(CONFIG.ABAS.VENDAS).appendRow([idVenda,data,new Date(),txt_(d.nome),cpfFmt_(cpf),txt_(d.telefone),idEstoque,a[3],a[4],a[5],a[6],a[7],custo,valor,lucro,txt_(d.formaPagamento),txt_(d.observacoes),u.nome,u.id,'Pendente','','']);
   sh.getRange(row,10,1,4).setValues([['Vendido',idVenda,data,u.nome]]);sh.getRange(row,18).setValue('Vendido');
+  limparCacheCatalogo_();
   return{sucesso:true,idVenda,lucro,mensagem:'Venda cadastrada.'};
+}
+
+function cadastrarNotaProduto_(d){
+  const u=auth_(d.token),nome=txt_(d.nome),produto=txt_(d.produto),cpf=cpfLimpo_(d.cpf);
+  const quantidade=Number(d.quantidade),valor=num_(d.valor),garantiaDias=Number(d.garantiaDias||0),data=data_(d.dataVenda);
+  if(!nome||!produto||!Number.isInteger(quantidade)||quantidade<1||quantidade>999||valor<=0||!Number.isFinite(valor))throw new Error('Confira os dados do recibo.');
+  if(cpf&&!cpfValido_(cpf))throw new Error('CPF inválido.');
+  if(!Number.isInteger(garantiaDias)||garantiaDias<0||garantiaDias>3650)throw new Error('Informe uma garantia válida.');
+  const idNota=id_('RECIBO'),sh=criarAba_(SpreadsheetApp.getActiveSpreadsheet(),CONFIG.ABAS.NOTAS_PRODUTO,['ID Nota','Data da venda','Data de cadastro','Nome do cliente','CPF','Telefone','Acessório vendido','Quantidade','Valor total','Forma de pagamento','Garantia (dias)','Observações','Funcionário responsável','ID Funcionário']);
+  const lock=LockService.getScriptLock();lock.waitLock(30000);
+  try{
+    sh.appendRow([idNota,data,new Date(),nome,cpf?cpfFmt_(cpf):'',txt_(d.telefone),produto,quantidade,valor,txt_(d.formaPagamento),garantiaDias,txt_(d.observacoes),u.nome,u.id]);
+    return{sucesso:true,idNota,mensagem:'Recibo salvo.'};
+  }finally{lock.releaseLock()}
+}
+
+// As solicitações públicas ficam em ManutencoesSite. As OS emitidas no painel
+// têm uma aba própria, com busca interna e chave para acompanhamento público.
+function abaOS_(){
+  const ss=SpreadsheetApp.getActiveSpreadsheet();
+  let sh=ss.getSheetByName('OrdensServico');
+  if(!sh){
+    sh=ss.getSheets().find(aba=>{
+      if(aba.getLastRow()<1||aba.getLastColumn()<1)return false;
+      const h=aba.getRange(1,1,1,aba.getLastColumn()).getValues()[0].map(txt_);
+      return h.includes('ID OS')&&h.includes('Status');
+    });
+  }
+  if(!sh)sh=ss.insertSheet('OrdensServico');
+  const existentes=sh.getLastColumn()?sh.getRange(1,1,1,sh.getLastColumn()).getValues()[0].map(txt_):[];
+  const faltantes=OS_HEADERS_.filter(h=>!existentes.includes(h));
+  if(faltantes.length)sh.getRange(1,existentes.length+1,1,faltantes.length).setValues([faltantes]);
+  sh.setFrozenRows(1);
+  return sh;
+}
+function mapaOS_(sh){
+  const h=sh.getRange(1,1,1,sh.getLastColumn()).getValues()[0];
+  const m={};h.forEach((nome,i)=>m[String(nome).trim()]=i);
+  return{h,m};
+}
+function localizarOS_(sh,m,id){
+  const vals=sh.getDataRange().getValues();
+  for(let i=1;i<vals.length;i++)if(txt_(vals[i][m['ID OS']])===id)return{linha:i+1,valores:vals[i]};
+  throw new Error('OS não encontrada.');
+}
+function cadastrarOS_(d){
+  const u=auth_(d.token),nome=txt_(d.nome),descricao=txt_(d.descricao),cpf=cpfLimpo_(d.cpf),valor=num_(d.valor),data=data_(d.dataOS);
+  const custoInformado=d.custoPeca!==''&&d.custoPeca!=null;
+  const custo=custoInformado?num_(d.custoPeca):'';
+  const status=txt_(d.status)||'Recebido';
+  if(!nome||!descricao||valor<=0||!Number.isFinite(valor))throw new Error('Confira os dados da OS.');
+  if(cpf&&!cpfValido_(cpf))throw new Error('CPF inválido.');
+  if(custoInformado&&(custo<0||!Number.isFinite(custo)))throw new Error('Informe um custo válido.');
+  if(!OS_STATUS_.includes(status))throw new Error('Status inválido.');
+  const sh=abaOS_(),{h}=mapaOS_(sh),idOS=id_('OS'),agora=new Date();
+  const registro={'ID OS':idOS,'Data da OS':data,'Data de cadastro':agora,'Nome do cliente':nome,'CPF':cpf?cpfFmt_(cpf):'',
+    'Telefone':txt_(d.telefone),'Aparelho / produto':txt_(d.produto),'Descrição do serviço':descricao,
+    'Valor':valor,'Custo da peça / serviço':custo,'Forma de pagamento':txt_(d.formaPagamento),'Observações':txt_(d.observacoes),
+    'Funcionário responsável':u.nome,'ID Funcionário':u.id,'Status':status,
+    'Status atualizado por':u.nome,'Status atualizado em':agora,
+    'Custo atualizado por':custoInformado?u.nome:'','Custo atualizado em':custoInformado?agora:'',
+    'Chave pública':Utilities.getUuid().replace(/-/g,'')};
+  const lock=LockService.getScriptLock();lock.waitLock(30000);
+  try{sh.appendRow(h.map(c=>registro[String(c).trim()]??''));return{sucesso:true,idOS,mensagem:'OS salva.'}}
+  finally{lock.releaseLock()}
+}
+function listarOS_(d){
+  auth_(d.token);
+  const sh=abaOS_(),{h,m}=mapaOS_(sh),vals=sh.getDataRange().getValues();
+  const busca=txt_(d.pesquisa).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  const status=txt_(d.status),inicio=d.dataInicial?inicio_(data_(d.dataInicial)):null,fim=d.dataFinal?fim_(data_(d.dataFinal)):null;
+  const ordens=[];
+  for(let i=1;i<vals.length;i++){
+    const linha=vals[i];if(!txt_(linha[m['ID OS']]))continue;
+    const data=dataSeg_(linha[m['Data da OS']]);
+    if(inicio&&(!data||data<inicio)||fim&&(!data||data>fim))continue;
+    const atual=txt_(linha[m['Status']])||'Recebido';
+    if(status==='ativos'&&atual==='Entregue'||status&&status!=='ativos'&&atual!==status)continue;
+    if(busca&&!['ID OS','Nome do cliente','Telefone','Aparelho / produto','Descrição do serviço'].some(c=>txt_(linha[m[c]]).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().includes(busca)))continue;
+    if(!txt_(linha[m['Chave pública']])){
+      linha[m['Chave pública']]=Utilities.getUuid().replace(/-/g,'');
+      sh.getRange(i+1,m['Chave pública']+1).setValue(linha[m['Chave pública']]);
+    }
+    const o={};h.forEach((c,j)=>o[c]=linha[j] instanceof Date?(c==='Data da OS'?Utilities.formatDate(linha[j],CONFIG.TIMEZONE,'dd/MM/yyyy'):fmtDH_(linha[j])):linha[j]);
+    ordens.push(o);
+  }
+  ordens.reverse();
+  return{sucesso:true,ordens};
+}
+function alterarStatusOS_(d){
+  const u=auth_(d.token),id=txt_(d.idOS),status=txt_(d.status);
+  if(!OS_STATUS_.includes(status))throw new Error('Status inválido.');
+  const sh=abaOS_(),{m}=mapaOS_(sh),lock=LockService.getScriptLock();lock.waitLock(30000);
+  try{
+    const os=localizarOS_(sh,m,id),agora=new Date();
+    sh.getRange(os.linha,m['Status']+1).setValue(status);
+    sh.getRange(os.linha,m['Status atualizado por']+1).setValue(u.nome);
+    sh.getRange(os.linha,m['Status atualizado em']+1).setValue(agora);
+    return{sucesso:true,idOS:id,status};
+  }finally{lock.releaseLock()}
+}
+function atualizarCustoOS_(d){
+  const u=auth_(d.token),id=txt_(d.idOS),custo=num_(d.custoPeca);
+  if(d.custoPeca===''||d.custoPeca==null||custo<0||!Number.isFinite(custo))throw new Error('Informe um custo válido.');
+  const sh=abaOS_(),{m}=mapaOS_(sh),lock=LockService.getScriptLock();lock.waitLock(30000);
+  try{
+    const os=localizarOS_(sh,m,id),agora=new Date();
+    sh.getRange(os.linha,m['Custo da peça / serviço']+1).setValue(custo);
+    sh.getRange(os.linha,m['Custo atualizado por']+1).setValue(u.nome);
+    sh.getRange(os.linha,m['Custo atualizado em']+1).setValue(agora);
+    return{sucesso:true,idOS:id,custoPeca:custo};
+  }finally{lock.releaseLock()}
+}
+function acompanharOS_(d){
+  const id=txt_(d.idOS),chave=txt_(d.chave);
+  if(!id||!chave)throw new Error('Link de acompanhamento incompleto.');
+  const sh=abaOS_(),{m}=mapaOS_(sh),os=localizarOS_(sh,m,id),r=os.valores;
+  if(txt_(r[m['Chave pública']])!==chave)throw new Error('Link de acompanhamento inválido.');
+  const data=r[m['Data da OS']];
+  return{sucesso:true,ordem:{idOS:id,status:txt_(r[m['Status']])||'Recebido',
+    aparelho:txt_(r[m['Aparelho / produto']]),servico:txt_(r[m['Descrição do serviço']]),
+    dataOS:data instanceof Date?Utilities.formatDate(data,CONFIG.TIMEZONE,'dd/MM/yyyy'):txt_(data),
+    atualizadoEm:r[m['Status atualizado em']]?fmtDH_(r[m['Status atualizado em']]):fmtDH_(r[m['Data de cadastro']])}};
 }
 
 
@@ -361,11 +502,24 @@ function atualizarProdutoSite_(d){
     const fotos=salvarFotosProduto_(novasFotos,d.fotosNomes,'','',registro[0]);
     sh.getRange(row,19,1,4).setValues([[fotos[0].url,fotos[0].id,JSON.stringify(fotos.map(f=>f.url)),JSON.stringify(fotos.map(f=>f.id))]]);
   }
+  limparCacheCatalogo_();
   return{sucesso:true,mensagem:'Produto atualizado.'};
 }
+const CACHE_CATALOGO_PUBLICO='catalogo_publico_v1';
+function limparCacheCatalogo_(){
+  try{CacheService.getScriptCache().remove(CACHE_CATALOGO_PUBLICO)}catch(e){}
+}
 function produtosPublicos_(){
+  const cache=CacheService.getScriptCache();
+  try{
+    const salvo=cache.get(CACHE_CATALOGO_PUBLICO);
+    if(salvo)return ContentService.createTextOutput(salvo).setMimeType(ContentService.MimeType.JSON);
+  }catch(e){}
+
   const itens=registrosDisplay_(aba_(CONFIG.ABAS.ESTOQUE)).filter(r=>txt_(r.Status).toLowerCase()==='disponível'&&['Publicado','Reservado'].includes(txt_(r['Status site']))).map(r=>{const fotos=listaJson_(r['Fotos URLs']);if(!fotos.length&&txt_(r['Foto URL']))fotos.push(r['Foto URL']);return{id:r['ID Estoque'],modelo:r.Modelo,armazenamento:r.Armazenamento,cor:r.Cor,preco:num_(r['Preço site']),categoria:r['Categoria site']||'iPhone',condicao:r['Condição site']||'Seminovo',bateria:r['Bateria site']||'',status:r['Status site'],foto:fotos[0]||'',fotos:fotos};});
-  return json_({sucesso:true,produtos:itens});
+  const resposta=JSON.stringify({sucesso:true,produtos:itens});
+  try{if(resposta.length<95000)cache.put(CACHE_CATALOGO_PUBLICO,resposta,21600)}catch(e){}
+  return ContentService.createTextOutput(resposta).setMimeType(ContentService.MimeType.JSON);
 }
 
 function listarCompras_(d){
@@ -561,6 +715,7 @@ function editarCompra_(d){
     const fotos=salvarFotosProduto_(novasFotos,d.fotosNomes,'','',ve[re-1][0]);
     shE.getRange(re,19,1,4).setValues([[fotos[0].url,fotos[0].id,JSON.stringify(fotos.map(f=>f.url)),JSON.stringify(fotos.map(f=>f.id))]]);
   }
+  limparCacheCatalogo_();
   return{sucesso:true,mensagem:'Compra e informações do site alteradas com sucesso.'};
 }
 function editarVenda_(d){
