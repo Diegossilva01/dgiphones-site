@@ -442,9 +442,6 @@ function acoesPagamento(item,mes){
   if(!item.salarioPago||(!item.comissaoPaga&&Number(item.comissaoCalculada||0)>0))a.push(`<button class="mini-action total" onclick="baixarPagamentoEquipe('${esc(item.id)}','total','${mes}',true)"><i class="fa-solid fa-circle-check"></i> Baixar tudo</button>`);
   return `<div class="finance-actions">${a.join('')}</div>`;
 }
-function prazoPagamentoTexto(dias){
-  const n=Number(dias||0);if(n===0)return 'Vence hoje';if(n>0)return `Faltam ${n} dia${n===1?'':'s'}`;const a=Math.abs(n);return `Atrasado ${a} dia${a===1?'':'s'}`;
-}
 async function loadValesFuncionario(mes){
   const body=$("#workerValesBody"),saldo=$("#valeSaldoDisponivel");if(!body||isAdmin())return;
   try{
@@ -554,7 +551,6 @@ async function loadPagamentos(){
       if($("#workerPagamentoComissao"))$("#workerPagamentoComissao").textContent=money(comissao);
       if(totalEl){totalEl.textContent=money(totalAtual);totalEl.classList.toggle('negative-balance',totalAtual<0)}
       if($("#workerPagamentoData"))$("#workerPagamentoData").textContent=item.dataPagamentoBR||financeiro.dataPagamentoBR||'—';
-      if($("#workerPagamentoPrazo"))$("#workerPagamentoPrazo").textContent=prazoPagamentoTexto(item.diasAtePagamento??financeiro.diasAtePagamento??0);
       if($("#workerPagamentoStatus"))$("#workerPagamentoStatus").innerHTML=statusPagamento(item);
       configurarPix(item.chavePix||'',item.tipoChavePix||'');
       await loadValesFuncionario(mes);
@@ -569,10 +565,10 @@ async function loadPagamentos(){
   body.innerHTML='<tr><td colspan="9">Carregando...</td></tr>';msg.textContent='';
   try{
     const j=await api('listarFinanceiroEquipe',{mes});state.financeiro=j;const itens=j.itens||[];
-    $("#financeVencimento").textContent=j.dataPagamentoBR||'—';$("#financeDiasPagamento").textContent=prazoPagamentoTexto(j.diasAtePagamento);
+    $("#financeVencimento").textContent=j.dataPagamentoBR||'—';
     $("#financeSalario").textContent=money(j.resumo?.salariosLiquidos??j.resumo?.salarios??0);$("#financeVale").textContent=money(j.resumo?.valeRefeicao||0);$("#financeComissao").textContent=money(j.resumo?.comissoes||0);$("#financeTotal").textContent=money(j.resumo?.totalPagar??j.resumo?.totalAcumulado??0);
     $("#financeVendas").textContent=Number(j.vendasCompartilhadas||0);
-    body.innerHTML=itens.length?itens.map(item=>{const prazo=prazoPagamentoTexto(item.diasAtePagamento);const prazoClass=Number(item.diasAtePagamento)<0?'late':Number(item.diasAtePagamento)===0?'today':'future';return `<tr><td><strong>${esc(item.nome)}</strong><br><small>${esc(item.perfil||'')} • desde ${esc(item.dataCadastro||'—')}</small></td><td><strong>${money(item.salarioLiquido??item.salarioCalculado)}</strong><br><small>${item.diasSalario||0}/30 dias • bruto ${money(item.salarioCalculado)}${Number(item.valesAprovados||0)>0?` • vales -${money(item.valesAprovados)}`:''}</small></td><td><strong>${money(item.valeRefeicaoCalculado)}</strong><br><small>${item.diasVale||0} dias × ${money(item.valeRefeicaoDia||0)}</small></td><td><strong>${money(item.comissaoCalculada)}</strong><br><small>2% de ${money(item.faturamento)} • ${item.vendas||0} venda(s) aprovada(s)</small></td><td><strong>${money(item.totalPagar)}</strong><br><small>Total ainda a pagar</small></td><td><span class="pay-date">${esc(item.dataPagamentoBR||'—')}</span><br><span class="pay-countdown ${prazoClass}">${esc(prazo)}</span></td><td>${item.chavePix?`<span class="pix-key"><i class="fa-brands fa-pix"></i><span>${esc(item.chavePix)}<small>${esc(item.tipoChavePix||'Tipo não informado')}</small></span></span>`:'<span class="muted">Não cadastrada</span>'}</td><td>${statusPagamento(item)}</td><td>${acoesPagamento(item,mes)}</td></tr>`}).join(''):'<tr><td colspan="9">Nenhum funcionário participante da comissão.</td></tr>';
+    body.innerHTML=itens.length?itens.map(item=>{return `<tr><td><strong>${esc(item.nome)}</strong><br><small>${esc(item.perfil||'')} • desde ${esc(item.dataCadastro||'—')}</small></td><td><strong>${money(item.salarioLiquido??item.salarioCalculado)}</strong><br><small>Salário mensal ${money(item.salarioCalculado)}${Number(item.valesAprovados||0)>0?` • vales -${money(item.valesAprovados)}`:''}</small></td><td><strong>${money(item.valeRefeicaoCalculado)}</strong></td><td><strong>${money(item.comissaoCalculada)}</strong><br><small>2% de ${money(item.faturamento)} • ${item.vendas||0} venda(s) aprovada(s)</small></td><td><strong>${money(item.totalPagar)}</strong><br><small>Total ainda a pagar</small></td><td><span class="pay-date">${esc(item.dataPagamentoBR||'—')}</span></td><td>${item.chavePix?`<span class="pix-key"><i class="fa-brands fa-pix"></i><span>${esc(item.chavePix)}<small>${esc(item.tipoChavePix||'Tipo não informado')}</small></span></span>`:'<span class="muted">Não cadastrada</span>'}</td><td>${statusPagamento(item)}</td><td>${acoesPagamento(item,mes)}</td></tr>`}).join(''):'<tr><td colspan="9">Nenhum funcionário participante da comissão.</td></tr>';
     await loadValesAdmin(mes);
   }catch(e){body.innerHTML='<tr><td colspan="9">Não foi possível carregar.</td></tr>';msg.textContent=e.message}
 }

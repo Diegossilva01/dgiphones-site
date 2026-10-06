@@ -45,13 +45,14 @@ test('existing OS requires matching private key and never discloses CPF',async()
   }finally{db.get=original}
 });
 
-test('salary pro rata and meal allowance handle a full month and partial admission',()=>{
+test('fixed monthly salary is independent of elapsed days and admission within the month',()=>{
   const full=finance.payroll(common,{salario:3000,valeRefeicaoDia:20,diasSemana:5,dataCadastro:'2025-01-01'},'2026-08');
   assert.equal(full.salarioCalculado,3000);
-  assert.ok(full.diasVale>0&&full.diasVale<=23);
+  assert.ok(full.valeRefeicaoCalculado>0&&full.valeRefeicaoCalculado<=460);
   const later=finance.payroll(common,{salario:3000,valeRefeicaoDia:20,diasSemana:5,dataCadastro:'2026-08-25'},'2026-08');
-  assert.equal(later.diasSalario,7);
-  assert.equal(later.salarioCalculado,700);
+  assert.equal(later.salarioCalculado,3000);
+  assert.equal(later.valeRefeicaoCalculado,full.valeRefeicaoCalculado);
+  assert.equal(later.dataPagamento,'2026-09-05');
 });
 
 test('panel lists historical quotes and maintenance requests and saves attendance',async()=>{

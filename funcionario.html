@@ -365,7 +365,7 @@
 
       <div class="cards commission-cards worker-only worker-money-cards">
         <article class="worker-money-card salary"><div class="worker-card-icon"><i class="fa-solid fa-wallet"></i></div><span>Saldo de salário</span><strong id="workerSalario">R$ 0,00</strong><small>Já considera os vales solicitados no período</small></article>
-        <article class="worker-money-card meal"><div class="worker-card-icon"><i class="fa-solid fa-utensils"></i></div><span>Meu vale-refeição</span><strong id="workerVale">R$ 0,00</strong><small>Acumulado no período</small></article>
+        <article class="worker-money-card meal"><div class="worker-card-icon"><i class="fa-solid fa-utensils"></i></div><span>Meu vale-refeição</span><strong id="workerVale">R$ 0,00</strong><small>Valor previsto para o mês</small></article>
         <article class="worker-money-card commission"><div class="worker-card-icon"><i class="fa-solid fa-percent"></i></div><span>Comissão a receber</span><strong id="workerPagamentoComissao">R$ 0,00</strong><small>Somente vendas aprovadas • 2%</small></article>
         <article class="worker-money-card total"><div class="worker-card-icon"><i class="fa-solid fa-sack-dollar"></i></div><span>Total a receber</span><strong id="workerTotal">R$ 0,00</strong><small>Salário + VR + comissão</small></article>
       </div>
@@ -375,8 +375,7 @@
           <div><span class="eyebrow">Informações do pagamento</span><h2>Meu próximo pagamento</h2><p class="commission-note">Os valores são atualizados automaticamente conforme o período e as aprovações do administrador.</p></div>
         </div>
         <div class="worker-payment-info-grid">
-          <div class="worker-payment-info-item"><span>Pagamento previsto</span><strong id="workerPagamentoData">—</strong><small>5º dia útil</small></div>
-          <div class="worker-payment-info-item"><span>Prazo</span><strong id="workerPagamentoPrazo">—</strong><small>Contagem automática</small></div>
+          <div class="worker-payment-info-item"><span>Pagamento previsto</span><strong id="workerPagamentoData">—</strong><small>5º dia útil do mês seguinte</small></div>
           <div class="worker-payment-info-item status"><span>Status dos pagamentos</span><div id="workerPagamentoStatus" class="payment-statuses"><span class="muted">Carregando...</span></div></div>
         </div>
         <p id="workerFinanceMsg" class="message"></p>
@@ -415,20 +414,19 @@
       </div>
 
       <div class="cards commission-cards payroll-cards admin-only">
-        <article><span>Salários acumulados</span><strong id="financeSalario">R$ 0,00</strong></article>
-        <article><span>Vale-refeição acumulado</span><strong id="financeVale">R$ 0,00</strong></article>
+        <article><span>Salários do mês</span><strong id="financeSalario">R$ 0,00</strong></article>
+        <article><span>Vale-refeição do mês</span><strong id="financeVale">R$ 0,00</strong></article>
         <article><span>Comissões aprovadas</span><strong id="financeComissao">R$ 0,00</strong></article>
-        <article><span>Total acumulado</span><strong id="financeTotal">R$ 0,00</strong></article>
+        <article><span>Total a pagar</span><strong id="financeTotal">R$ 0,00</strong></article>
         <article><span>Vendas aprovadas no mês</span><strong id="financeVendas">0</strong></article>
-        <article><span>Pagamento até</span><strong id="financeVencimento">—</strong></article>
-        <article><span>Prazo para pagamento</span><strong id="financeDiasPagamento">—</strong></article>
+        <article><span>Pagamento previsto</span><strong id="financeVencimento">—</strong></article>
       </div>
 
       <div class="panel payroll-panel admin-only">
         <div class="panel-head"><div><h2>Pagamento da equipe</h2><p class="commission-note">A comissão abaixo considera somente vendas aprovadas e ocorridas depois do cadastro de cada funcionário.</p></div></div>
         <div class="table-wrap">
           <table class="payroll-table">
-            <thead><tr><th>Funcionário</th><th>Salário acumulado</th><th>Vale-refeição</th><th>Comissão 2%</th><th>Total acumulado</th><th>Pagamento</th><th>Chave Pix</th><th>Pagamentos</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Funcionário</th><th>Salário mensal</th><th>Vale-refeição</th><th>Comissão 2%</th><th>Total a pagar</th><th>Pagamento</th><th>Chave Pix</th><th>Pagamentos</th><th>Ações</th></tr></thead>
             <tbody id="pagamentosBody"><tr><td colspan="9">Selecione o mês para carregar.</td></tr></tbody>
           </table>
         </div>
@@ -553,7 +551,7 @@
 
 <div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-<script src="funcionario.js?v=20260929-leads"></script>
+<script src="funcionario.js?v=20261006-pagamento-dia-util"></script>
 <script src="atendimentos.js?v=20260929-leads3"></script>
 </body>
 </html>
