@@ -3,6 +3,17 @@ const assert=require('node:assert/strict');
 const finance=require('../lib/finance');
 const common=require('../lib/common');
 
+test('meal allowance starts on October 6 and automatically uses complete later months',()=>{
+  const f={salario:2094,valeRefeicaoDia:21.5,diasSemana:6,dataCadastro:'2026-07-28'};
+  const october=finance.payroll(common,f,'2026-10');
+  assert.equal(october.valeRefeicaoCalculado,473);
+  assert.equal(october.salarioCalculado,2094);
+  assert.equal(finance.payroll({...common,today:()=> '2026-10-20'},f,'2026-10').valeRefeicaoCalculado,473);
+  assert.equal(finance.payroll(common,f,'2026-11').valeRefeicaoCalculado,494.5);
+  assert.equal(finance.payroll(common,{...f,diasSemana:5},'2026-10').valeRefeicaoCalculado,387);
+  assert.equal(finance.payroll(common,{...f,dataCadastro:'2026-10-30'},'2026-10').valeRefeicaoCalculado,43);
+});
+
 test('monthly salary stays fixed throughout the month and rolls payment into next year',()=>{
   const f={salario:2094,valeRefeicaoDia:21.5,diasSemana:6,dataCadastro:'2026-07-28'};
   const early=finance.payroll({...common,today:()=> '2026-10-01'},f,'2026-10');
