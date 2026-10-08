@@ -1,6 +1,6 @@
 const SISTEMA_API_URL = "/api/interna";
 
-const state={token:localStorage.getItem("ct_token")||"",user:null,chart:null,estoque:[],historico:[],dados:null,funcionarios:[],revendedores:[],financeiro:null,ordensServico:[]};
+const state={token:"cookie",user:null,chart:null,estoque:[],historico:[],dados:null,funcionarios:[],revendedores:[],financeiro:null,ordensServico:[]};
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 const money=v=>Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
@@ -866,3 +866,4 @@ document.addEventListener('scroll',e=>{
   const index=Math.round(gallery.scrollLeft/Math.max(gallery.clientWidth,1));
   updateResellerGallery(wrap,index);
 },true);
+
