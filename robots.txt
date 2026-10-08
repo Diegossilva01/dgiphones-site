@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /funcionario
+Disallow: /api/interna
+Disallow: /api/painel
 
 Sitemap: https://www.celltechpanamby.com.br/sitemap.xml
+
