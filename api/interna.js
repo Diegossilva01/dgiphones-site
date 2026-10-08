@@ -245,17 +245,10 @@ async function action(a,d,u){
     case 'listarRevendedores':return {sucesso:true,revendedores:(await list('Funcionarios')).filter(f=>c.normal(f.Perfil)==='revendedor').map(f=>{const x=publicUser(f);return {id:x.id,nome:x.nome,usuario:x.usuario,status:x.status,dataCadastro:x.dataCadastro}})};
     case 'cadastrarFuncionario':case 'cadastrarRevendedor':{
       if(a==='cadastrarFuncionario')requiredAdmin(u);
-      if(a==='cadastrarRevendedor'){
-        if(!['administrador','funcionario','vendedora','tecnico'].includes(c.normal(u.perfil)))bad('Sem permissão para cadastrar revendedores.');
-        // Esta operação só cria revendedores; nunca edita uma conta existente.
-        if(d.idFuncionario)bad('Use o cadastro de funcionários para editar usuários.');
-        d={nome:d.nome,usuario:d.usuario,senha:d.senha,status:d.status,perfil:'Revendedor'};
-      }
-      if(d.perfil&&!['administrador','funcionario','vendedora','tecnico','revendedor'].includes(c.normal(d.perfil)))bad('Perfil inválido.');
       const userName=c.normal(d.usuario),name=c.text(d.nome),password=String(d.senha||'');
       if(!name||userName.length<3||!d.idFuncionario&&password.length<6)bad('Confira o nome, usuário e senha (mínimo 6 caracteres).');
       const all=await db.rows('Funcionarios');if(all.some(x=>c.normal(x['Usuário'])===userName&&x.ID!==d.idFuncionario))bad('Este usuário já existe.');
-      if(d.idFuncionario){r=await one('Funcionarios',d.idFuncionario);const revokeSessions=!!password||c.normal(r.Perfil)!==c.normal(d.perfil||'Funcionário')||d.status==='Inativo';Object.assign(r,{Nome:name,'Usuário':userName,Perfil:d.perfil||'Funcionário',Status:d.status==='Inativo'?'Inativo':'Ativo','Salário':c.money(d.salario),'Vale refeição dia':c.money(d.valeRefeicaoDia),'Dias por semana':Number(d.diasSemana)||6});if(password)r['Senha Hash']=c.hash(password);if(d.chavePix!==undefined)r['Chave PIX']=c.text(d.chavePix);if(d.tipoChavePix!==undefined)r['Tipo chave PIX']=c.text(d.tipoChavePix);await save('Funcionarios',r);if(revokeSessions)await db.query('DELETE FROM ct_sessions WHERE employee_id=$1',[d.idFuncionario]);return {sucesso:true,mensagem:'Funcionário atualizado.'}}
+      if(d.idFuncionario){r=await one('Funcionarios',d.idFuncionario);Object.assign(r,{Nome:name,'Usuário':userName,Perfil:d.perfil||'Funcionário',Status:d.status==='Inativo'?'Inativo':'Ativo','Salário':c.money(d.salario),'Vale refeição dia':c.money(d.valeRefeicaoDia),'Dias por semana':Number(d.diasSemana)||6});if(password)r['Senha Hash']=c.hash(password);if(d.chavePix!==undefined)r['Chave PIX']=c.text(d.chavePix);if(d.tipoChavePix!==undefined)r['Tipo chave PIX']=c.text(d.tipoChavePix);await save('Funcionarios',r);return {sucesso:true,mensagem:'Funcionário atualizado.'}}
       const idFunc=c.id('FUNC');r={ID:idFunc,Nome:name,'Usuário':userName,'Senha Hash':c.hash(password),Perfil:a==='cadastrarRevendedor'?'Revendedor':d.perfil||'Funcionário',Status:d.status==='Inativo'?'Inativo':'Ativo','Data de cadastro':c.now(),'Salário':c.money(d.salario),'Chave PIX':c.text(d.chavePix),'Vale refeição dia':c.money(d.valeRefeicaoDia),'Dias por semana':Number(d.diasSemana)||6,'Tipo chave PIX':c.text(d.tipoChavePix)};
       await db.add('Funcionarios',idFunc,r);return {sucesso:true,idRevendedor:a==='cadastrarRevendedor'?idFunc:undefined,mensagem:'Usuário cadastrado.'};
     }
@@ -280,7 +273,6 @@ async function action(a,d,u){
 async function log(type,id,reason,u,r){const logId=c.id('LOG');await db.add('LogExclusoes',logId,{'ID Log':logId,'Data e hora':c.now(),'Tipo de registro':type,'ID do registro':id,Motivo:c.text(reason),'Funcionário responsável':u.nome,'ID Funcionário':u.id,'Dados removidos':JSON.stringify(db.clean(r))})}
 module.exports=async(req,res)=>{
   res.setHeader('Cache-Control','no-store');res.setHeader('Content-Type','application/json; charset=utf-8');
-  res.setHeader('X-Robots-Tag','noindex, nofollow, noarchive');
   if(req.method!=='POST')return res.status(405).json({sucesso:false,mensagem:'Método inválido.'});
   const origin=req.headers.origin,host=req.headers.host;
   if(origin&&new URL(origin).host!==host)return res.status(403).json({sucesso:false,mensagem:'Origem não autorizada.'});
@@ -292,7 +284,6 @@ module.exports=async(req,res)=>{
     if(a==='logout'){const token=cookieValue(req);if(token)await db.query('DELETE FROM ct_sessions WHERE token_hash=$1',[c.hash(token)]);cookie(res);return res.json({sucesso:true})}
     const {user,record}=await authenticate(req);
     if(a==='verificarToken')return res.json({sucesso:true,funcionario:user});
-    if(!['administrador','funcionario','vendedora','tecnico','revendedor'].includes(c.normal(user.perfil)))bad('Perfil sem permissão para acessar o sistema.');
     if(c.normal(user.perfil)==='revendedor'&&a!=='listarCatalogoRevendedor')bad('Seu acesso é exclusivo ao catálogo de revenda.');
     if(confirmation.has(a)&&c.hash(d.senhaConfirmacao||'')!==record['Senha Hash'])bad('Senha de confirmação incorreta.');
     return res.json(await action(a,d,user));
@@ -301,5 +292,4 @@ module.exports=async(req,res)=>{
     return res.status(200).json({sucesso:false,mensagem:err.message||'Erro ao processar solicitação.'});
   }
 };
-module.exports._internals={publicUser,filtered,summary,catalog,action,authenticate};
-
+module.exports._internals={publicUser,filtered,summary,catalog,action};
