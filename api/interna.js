@@ -4,7 +4,7 @@ const c=require('../lib/common');
 const finance=require('../lib/finance');
 const attendance=require('../lib/attendance');
 
-const confirmation=new Set(['salvarChegada','cadastrarCompra','excluirCompra','editarCompra','atualizarProdutoSite','excluirProdutoSite','cadastrarVenda','excluirVenda','editarVenda','cadastrarNotaProduto','cadastrarOS','cadastrarFuncionario','excluirFuncionario','removerFuncionario','deletarFuncionario','salvarMeuPix','alterarStatusComissaoVenda','registrarPagamentoEquipe','solicitarVale','alterarStatusVale','cadastrarRevendedor']);
+const confirmation=new Set(['cadastrarCompra','excluirCompra','editarCompra','atualizarProdutoSite','excluirProdutoSite','cadastrarVenda','excluirVenda','editarVenda','cadastrarNotaProduto','cadastrarOS','cadastrarFuncionario','excluirFuncionario','removerFuncionario','deletarFuncionario','salvarMeuPix','alterarStatusComissaoVenda','registrarPagamentoEquipe','solicitarVale','alterarStatusVale','cadastrarRevendedor']);
 const key={Compras:'ID Compra',Estoque:'ID Estoque',Vendas:'ID Venda',Funcionarios:'ID',OrdensServico:'ID OS'};
 const bad=message=>{throw Error(message)};
 const requiredAdmin=u=>{if(c.normal(u.perfil)!=='administrador')bad('Apenas administradores podem executar esta ação.')};
@@ -297,4 +297,5 @@ module.exports=async(req,res)=>{
   }
 };
 module.exports._internals={publicUser,filtered,summary,catalog,action};
+
 
