@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="./funcionario.css?v=20261024-chegadas">
+  <link rel="stylesheet" href="./funcionario.css?v=20261024-calendario1">
 </head>
 <body>
 <section id="loginScreen" class="login-screen">
@@ -512,7 +512,18 @@
         <div class="panel-head"><div><h2>Registrar chegada</h2><p class="commission-note">Registre a entrada de cada funcionário. O desconto entra automaticamente no salário do mês de referência.</p></div></div>
         <form id="chegadaForm" class="form-grid">
           <label>Funcionário<select name="idFuncionario" required><option value="">Selecione</option></select></label>
-          <label>Data<input type="date" name="data" required></label>
+          <div class="arrival-date-field">
+            <span id="chegadaDataLabel">Data</span>
+            <input type="hidden" name="data">
+            <button type="button" id="chegadaDataToggle" class="arrival-date-toggle" aria-labelledby="chegadaDataLabel chegadaDataValor" aria-expanded="false" aria-controls="chegadaCalendario"><span id="chegadaDataValor">Selecione a data</span><span aria-hidden="true">▦</span></button>
+            <div id="chegadaCalendario" class="arrival-calendar hidden" role="region" aria-label="Calendário de chegadas">
+              <div class="arrival-calendar-head"><button type="button" id="chegadaMesAnterior" aria-label="Mês anterior">‹</button><strong id="chegadaCalendarioMes" aria-live="polite"></strong><button type="button" id="chegadaMesSeguinte" aria-label="Próximo mês">›</button></div>
+              <div class="arrival-calendar-week" aria-hidden="true"><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span></div>
+              <div id="chegadaCalendarioDias" class="arrival-calendar-days"></div>
+              <p id="chegadaCalendarioAviso" class="arrival-calendar-note" role="status"></p>
+              <div class="arrival-calendar-legend"><span class="arrival-calendar-dot" aria-hidden="true"></span> Vermelho: dia já cadastrado. Clique para conferir ou corrigir.</div>
+            </div>
+          </div>
           <label>Entrada prevista<input type="time" name="previsto" required></label>
           <label>Chegada real<input type="time" name="chegada" required></label>
           <label>Tratamento<select name="tratamento"><option value="descontar">Calcular atraso</option><option value="abonar">Abonar atraso (sem desconto)</option></select></label>
@@ -582,9 +593,10 @@
 
 <div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-<script src="funcionario.js?v=20261024-chegadas"></script>
-<script src="chegadas.js?v=20261024-chegadas"></script>
+<script src="funcionario.js?v=20261024-calendario1"></script>
+<script src="chegadas.js?v=20261024-calendario1"></script>
 <script src="atendimentos.js?v=20260929-leads3"></script>
 </body>
 </html>
+
 

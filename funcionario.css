@@ -503,3 +503,27 @@ body.dark-theme .lead-card{background:#151b22;border-color:#303945}body.dark-the
 #page-chegadas td .actions{flex-wrap:wrap;gap:6px}
 #page-chegadas .table-wrap{margin-top:18px}
 @media(max-width:760px){#page-chegadas .form-grid,#page-chegadas .filters{grid-template-columns:1fr}}
+
+
+/* Calendário: vermelho identifica um lançamento existente, não um atraso. */
+.arrival-date-field{position:relative;display:flex;flex-direction:column;gap:7px;min-width:0;font-size:13px;font-weight:700}
+.arrival-date-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:45px;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--white);color:inherit;text-align:left;cursor:pointer}
+.arrival-date-toggle.has-record{border-color:#d12838;color:#b21d2b;background:#fff1f2}
+.arrival-date-toggle:disabled{cursor:default;opacity:.75}
+.arrival-calendar{position:absolute;top:100%;left:0;width:min(340px,100%);padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--white);color:var(--black);box-shadow:0 12px 35px #0002;z-index:25;font-weight:500}
+.arrival-calendar-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.arrival-calendar-head strong{text-transform:capitalize}
+.arrival-calendar-head button{border:0;border-radius:8px;min-width:36px;min-height:36px;background:var(--bg);color:inherit;font-size:24px;cursor:pointer}
+.arrival-calendar-week,.arrival-calendar-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}
+.arrival-calendar-week{margin-bottom:6px;color:var(--muted);font-size:11px}
+.arrival-calendar-day{position:relative;min-width:0;min-height:36px;padding:7px 0;border:1px solid transparent;border-radius:8px;background:transparent;color:inherit;font-weight:600;cursor:pointer}
+.arrival-calendar-day:hover{background:var(--bg)}
+.arrival-calendar-day.registered{color:#b21d2b;background:#ffe4e7;border-color:#f1a9b2;font-weight:800}
+.arrival-calendar-day.selected{outline:2px solid currentColor;outline-offset:-3px}
+.arrival-calendar-day.today:not(.registered){border-color:#dca900}
+.arrival-calendar-day:disabled{opacity:.35;cursor:default}
+.arrival-day-dot{position:absolute;bottom:3px;left:calc(50% - 2px);width:4px;height:4px;border-radius:50%;background:currentColor}
+.arrival-calendar-note,.arrival-calendar-legend{font-size:11px;line-height:1.5;margin:10px 0 0;color:var(--muted)}
+.arrival-calendar-dot{display:inline-block;width:8px;height:8px;margin-right:4px;border-radius:50%;background:#d12838}
+.dark-theme .arrival-calendar{color:#e8edf2;background:#151b22}
+.dark-theme .arrival-calendar-day.registered,.dark-theme .arrival-date-toggle.has-record{background:#491e28;color:#ffb5bf;border-color:#ad4e60}
