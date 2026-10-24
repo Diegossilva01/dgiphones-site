@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="./funcionario.css?v=20260929-leads2">
+  <link rel="stylesheet" href="./funcionario.css?v=20261024-chegadas">
 </head>
 <body>
 <section id="loginScreen" class="login-screen">
@@ -38,6 +38,7 @@
       <button class="nav-btn" data-page="site"><i class="fa-solid fa-globe"></i> Produtos no site</button>
       <button class="nav-btn" data-page="comissao"><i class="fa-solid fa-percent"></i> Comissão</button>
       <button class="nav-btn" data-page="pagamentos"><i class="fa-solid fa-money-check-dollar"></i> Pagamentos</button>
+      <button class="nav-btn admin-only" data-page="chegadas"><i class="fa-solid fa-clock"></i> Chegadas</button>
       <button class="nav-btn admin-only" data-page="usuarios"><i class="fa-solid fa-users-gear"></i> Usuários</button>
       <button class="nav-btn staff-only" data-page="cadastro-revendedor"><i class="fa-solid fa-user-plus"></i> Revendedores</button>
       <button class="nav-btn reseller-only" data-page="revendedor" style="display:none"><i class="fa-solid fa-tags"></i> Catálogo de revenda</button>
@@ -364,7 +365,7 @@
       </div>
 
       <div class="cards commission-cards worker-only worker-money-cards">
-        <article class="worker-money-card salary"><div class="worker-card-icon"><i class="fa-solid fa-wallet"></i></div><span>Saldo de salário</span><strong id="workerSalario">R$ 0,00</strong><small>Já considera os vales solicitados no período</small></article>
+        <article class="worker-money-card salary"><div class="worker-card-icon"><i class="fa-solid fa-wallet"></i></div><span>Saldo de salário</span><strong id="workerSalario">R$ 0,00</strong><small>Já considera vales e descontos de atrasos</small></article>
         <article class="worker-money-card meal"><div class="worker-card-icon"><i class="fa-solid fa-utensils"></i></div><span>Meu vale-refeição</span><strong id="workerVale">R$ 0,00</strong><small>Valor previsto para o mês</small></article>
         <article class="worker-money-card commission"><div class="worker-card-icon"><i class="fa-solid fa-percent"></i></div><span>Comissão a receber</span><strong id="workerPagamentoComissao">R$ 0,00</strong><small>Somente vendas aprovadas • 2%</small></article>
         <article class="worker-money-card total"><div class="worker-card-icon"><i class="fa-solid fa-sack-dollar"></i></div><span>Total a receber</span><strong id="workerTotal">R$ 0,00</strong><small>Salário + VR + comissão</small></article>
@@ -378,6 +379,7 @@
           <div class="worker-payment-info-item"><span>Pagamento previsto</span><strong id="workerPagamentoData">—</strong><small>5º dia útil do mês seguinte</small></div>
           <div class="worker-payment-info-item status"><span>Status dos pagamentos</span><div id="workerPagamentoStatus" class="payment-statuses"><span class="muted">Carregando...</span></div></div>
         </div>
+        <p id="workerAtrasosInfo" class="commission-note"></p>
         <p id="workerFinanceMsg" class="message"></p>
       </div>
 
@@ -505,6 +507,31 @@
       <p id="revendedorMsg" class="message"></p>
     </section>
 
+    <section id="page-chegadas" class="page admin-only">
+      <div class="panel">
+        <div class="panel-head"><div><h2>Registrar chegada</h2><p class="commission-note">Registre a entrada de cada funcionário. O desconto entra automaticamente no salário do mês de referência.</p></div></div>
+        <form id="chegadaForm" class="form-grid">
+          <label>Funcionário<select name="idFuncionario" required><option value="">Selecione</option></select></label>
+          <label>Data<input type="date" name="data" required></label>
+          <label>Entrada prevista<input type="time" name="previsto" required></label>
+          <label>Chegada real<input type="time" name="chegada" required></label>
+          <label>Tratamento<select name="tratamento"><option value="descontar">Calcular atraso</option><option value="abonar">Abonar atraso (sem desconto)</option></select></label>
+          <label>Observação / justificativa<input name="observacao" maxlength="1000" placeholder="Obrigatória ao corrigir, abonar ou cancelar"></label>
+          <p id="chegadaCalculo" class="full commission-note">Configure o horário de entrada e as horas mensais na aba Usuários.</p>
+          <div class="full actions"><button type="submit" class="primary">Salvar chegada</button><button type="button" id="cancelarEdicaoChegada" class="secondary">Limpar</button><span class="message form-message" role="status"></span></div>
+        </form>
+        <p class="commission-note">Cálculo: salário mensal ÷ horas mensais ÷ 60 × minutos descontáveis. Até a tolerância de entrada, o desconto é zero; acima dela, conta o atraso inteiro. Este controle registra apenas chegadas; não apura saídas, compensações ou o limite de variações do ponto completo. Sem registro não gera falta nem desconto.</p>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h2>Histórico de chegadas</h2><p class="commission-note">Correções e cancelamentos preservam o histórico. Meses com salário pago precisam ser reabertos em Pagamentos.</p></div></div>
+        <div class="filters"><label>Mês<input type="month" id="chegadasMes"></label><label>Funcionário<select id="chegadasFuncionario"><option value="">Todos</option></select></label><button type="button" class="secondary" id="atualizarChegadas">Atualizar</button></div>
+        <p id="chegadasResumo" class="commission-note" role="status"></p>
+        <div class="table-wrap"><table><thead><tr><th>Funcionário</th><th>Dias registrados</th><th>Atraso total</th><th>Tempo descontável</th><th>Desconto no mês</th></tr></thead><tbody id="chegadasTotaisBody"></tbody></table></div>
+        <div class="table-wrap"><table><thead><tr><th>Data</th><th>Funcionário</th><th>Previsto</th><th>Chegada</th><th>Atraso</th><th>Desconto</th><th>Registro</th><th>Ações</th></tr></thead><tbody id="chegadasBody"><tr><td colspan="8">Selecione o mês para carregar.</td></tr></tbody></table></div>
+        <p id="chegadasMsg" class="message" role="status"></p>
+      </div>
+    </section>
+
     <section id="page-usuarios" class="page admin-only">
       <div class="panel form-panel">
         <div class="panel-head"><div><h2 id="usuarioFormTitulo">Cadastrar funcionário</h2><p class="commission-note">Defina o salário mensal e o perfil de cada integrante da equipe.</p></div></div>
@@ -517,6 +544,10 @@
           <label>Salário mensal<input name="salario" class="money" inputmode="decimal" placeholder="R$ 0,00" required></label>
           <label>Vale-refeição por dia<input name="valeRefeicaoDia" class="money" inputmode="decimal" placeholder="R$ 0,00"><small>O sistema multiplica este valor pelos dias previstos de trabalho.</small></label>
           <label>Jornada semanal<select name="diasSemana"><option value="6">Segunda a sábado (6 dias)</option><option value="5">Segunda a sexta (5 dias)</option></select></label>
+          <label>Entrada de segunda a sexta<input name="horarioEntrada" type="time"><small>Usado para preencher o horário previsto nas chegadas.</small></label>
+          <label>Entrada aos sábados<input name="horarioSabado" type="time"><small>Se vazio, usa a entrada de segunda a sexta.</small></label>
+          <label>Horas mensais para cálculo<input name="horasMensais" type="number" min="0.01" max="744" step="0.01" value="220" required><small>Informe o divisor da jornada contratada de cada funcionário.</small></label>
+          <label>Tolerância da entrada (minutos)<input name="toleranciaMinutos" type="number" min="5" max="120" value="5" required></label>
           <label>Status<select name="status"><option value="Ativo">Ativo</option><option value="Inativo">Inativo</option></select></label>
           <div class="full actions"><button class="primary" id="salvarFuncionarioBtn">Cadastrar funcionário</button><button type="button" class="secondary hidden" id="cancelarEdicaoFuncionario">Cancelar edição</button><span class="message form-message"></span></div>
         </form>
@@ -551,7 +582,9 @@
 
 <div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-<script src="funcionario.js?v=20261006-pagamento-dia-util"></script>
+<script src="funcionario.js?v=20261024-chegadas"></script>
+<script src="chegadas.js?v=20261024-chegadas"></script>
 <script src="atendimentos.js?v=20260929-leads3"></script>
 </body>
 </html>
+

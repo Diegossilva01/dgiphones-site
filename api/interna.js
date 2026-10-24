@@ -2,14 +2,15 @@ const crypto=require('node:crypto');
 const db=require('../lib/db');
 const c=require('../lib/common');
 const finance=require('../lib/finance');
+const attendance=require('../lib/attendance');
 
-const confirmation=new Set(['cadastrarCompra','excluirCompra','editarCompra','atualizarProdutoSite','excluirProdutoSite','cadastrarVenda','excluirVenda','editarVenda','cadastrarNotaProduto','cadastrarOS','cadastrarFuncionario','excluirFuncionario','removerFuncionario','deletarFuncionario','salvarMeuPix','alterarStatusComissaoVenda','registrarPagamentoEquipe','solicitarVale','alterarStatusVale','cadastrarRevendedor']);
+const confirmation=new Set(['salvarChegada','cadastrarCompra','excluirCompra','editarCompra','atualizarProdutoSite','excluirProdutoSite','cadastrarVenda','excluirVenda','editarVenda','cadastrarNotaProduto','cadastrarOS','cadastrarFuncionario','excluirFuncionario','removerFuncionario','deletarFuncionario','salvarMeuPix','alterarStatusComissaoVenda','registrarPagamentoEquipe','solicitarVale','alterarStatusVale','cadastrarRevendedor']);
 const key={Compras:'ID Compra',Estoque:'ID Estoque',Vendas:'ID Venda',Funcionarios:'ID',OrdensServico:'ID OS'};
 const bad=message=>{throw Error(message)};
 const requiredAdmin=u=>{if(c.normal(u.perfil)!=='administrador')bad('Apenas administradores podem executar esta ação.')};
 const isAdmin=u=>c.normal(u.perfil)==='administrador';
 const active=u=>c.normal(u.Status)==='ativo';
-const publicUser=f=>({id:f.ID,nome:f.Nome,usuario:f['Usuário'],perfil:f.Perfil||'Funcionário',status:f.Status||'Ativo',salario:c.money(f['Salário']),chavePix:f['Chave PIX']||'',tipoChavePix:f['Tipo chave PIX']||'',valeRefeicaoDia:c.money(f['Vale refeição dia']),diasSemana:Number(f['Dias por semana'])||6,dataCadastro:c.iso(f['Data de cadastro']),dataCadastroMs:c.stamp(f['Data de cadastro'])});
+const publicUser=f=>({...attendance.settings(f),id:f.ID,nome:f.Nome,usuario:f['Usuário'],perfil:f.Perfil||'Funcionário',status:f.Status||'Ativo',salario:c.money(f['Salário']),chavePix:f['Chave PIX']||'',tipoChavePix:f['Tipo chave PIX']||'',valeRefeicaoDia:c.money(f['Vale refeição dia']),diasSemana:Number(f['Dias por semana'])||6,dataCadastro:c.iso(f['Data de cadastro']),dataCadastroMs:c.stamp(f['Data de cadastro'])});
 const cookieValue=req=>{const match=String(req.headers.cookie||'').match(/(?:^|;\s*)ct_session=([^;]+)/);return match?decodeURIComponent(match[1]):''};
 const cookie=(res,token='',seconds=0)=>res.setHeader('Set-Cookie',`ct_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${seconds}`);
 async function authenticate(req){
@@ -241,6 +242,8 @@ async function action(a,d,u){
       const idNota=c.id('RECIBO');r={'ID Nota':idNota,'Data da venda':c.br(d.dataVenda),'Data de cadastro':c.now(),'Nome do cliente':c.text(d.nome),CPF:d.cpf?c.cpf(d.cpf):'',Telefone:c.text(d.telefone),'Acessório vendido':c.text(d.produto),Quantidade:Number(d.quantidade), 'Valor total':c.money(d.valor),'Forma de pagamento':c.text(d.formaPagamento),'Garantia (dias)':Number(d.garantiaDias)||0,'Observações':c.text(d.observacoes),'Funcionário responsável':u.nome,'ID Funcionário':u.id};
       await db.add('RecibosAcessorios',idNota,r);return {sucesso:true,idNota,mensagem:'Recibo salvo.'};
     }
+    case 'listarChegadas':return attendance.list(db,c,d,u);
+    case 'salvarChegada':return attendance.save(db,c,d,u);
     case 'listarFuncionarios':requiredAdmin(u);return {sucesso:true,funcionarios:(await list('Funcionarios')).map(publicUser)};
     case 'listarRevendedores':return {sucesso:true,revendedores:(await list('Funcionarios')).filter(f=>c.normal(f.Perfil)==='revendedor').map(f=>{const x=publicUser(f);return {id:x.id,nome:x.nome,usuario:x.usuario,status:x.status,dataCadastro:x.dataCadastro}})};
     case 'cadastrarFuncionario':case 'cadastrarRevendedor':{
@@ -248,8 +251,9 @@ async function action(a,d,u){
       const userName=c.normal(d.usuario),name=c.text(d.nome),password=String(d.senha||'');
       if(!name||userName.length<3||!d.idFuncionario&&password.length<6)bad('Confira o nome, usuário e senha (mínimo 6 caracteres).');
       const all=await db.rows('Funcionarios');if(all.some(x=>c.normal(x['Usuário'])===userName&&x.ID!==d.idFuncionario))bad('Este usuário já existe.');
-      if(d.idFuncionario){r=await one('Funcionarios',d.idFuncionario);Object.assign(r,{Nome:name,'Usuário':userName,Perfil:d.perfil||'Funcionário',Status:d.status==='Inativo'?'Inativo':'Ativo','Salário':c.money(d.salario),'Vale refeição dia':c.money(d.valeRefeicaoDia),'Dias por semana':Number(d.diasSemana)||6});if(password)r['Senha Hash']=c.hash(password);if(d.chavePix!==undefined)r['Chave PIX']=c.text(d.chavePix);if(d.tipoChavePix!==undefined)r['Tipo chave PIX']=c.text(d.tipoChavePix);await save('Funcionarios',r);return {sucesso:true,mensagem:'Funcionário atualizado.'}}
-      const idFunc=c.id('FUNC');r={ID:idFunc,Nome:name,'Usuário':userName,'Senha Hash':c.hash(password),Perfil:a==='cadastrarRevendedor'?'Revendedor':d.perfil||'Funcionário',Status:d.status==='Inativo'?'Inativo':'Ativo','Data de cadastro':c.now(),'Salário':c.money(d.salario),'Chave PIX':c.text(d.chavePix),'Vale refeição dia':c.money(d.valeRefeicaoDia),'Dias por semana':Number(d.diasSemana)||6,'Tipo chave PIX':c.text(d.tipoChavePix)};
+      const jornada=a==='cadastrarFuncionario'?attendance.settingsInput(d):{};
+      if(d.idFuncionario){r=await one('Funcionarios',d.idFuncionario);Object.assign(r,{...jornada,Nome:name,'Usuário':userName,Perfil:d.perfil||'Funcionário',Status:d.status==='Inativo'?'Inativo':'Ativo','Salário':c.money(d.salario),'Vale refeição dia':c.money(d.valeRefeicaoDia),'Dias por semana':Number(d.diasSemana)||6});if(password)r['Senha Hash']=c.hash(password);if(d.chavePix!==undefined)r['Chave PIX']=c.text(d.chavePix);if(d.tipoChavePix!==undefined)r['Tipo chave PIX']=c.text(d.tipoChavePix);await save('Funcionarios',r);return {sucesso:true,mensagem:'Funcionário atualizado.'}}
+      const idFunc=c.id('FUNC');r={...jornada,ID:idFunc,Nome:name,'Usuário':userName,'Senha Hash':c.hash(password),Perfil:a==='cadastrarRevendedor'?'Revendedor':d.perfil||'Funcionário',Status:d.status==='Inativo'?'Inativo':'Ativo','Data de cadastro':c.now(),'Salário':c.money(d.salario),'Chave PIX':c.text(d.chavePix),'Vale refeição dia':c.money(d.valeRefeicaoDia),'Dias por semana':Number(d.diasSemana)||6,'Tipo chave PIX':c.text(d.tipoChavePix)};
       await db.add('Funcionarios',idFunc,r);return {sucesso:true,idRevendedor:a==='cadastrarRevendedor'?idFunc:undefined,mensagem:'Usuário cadastrado.'};
     }
     case 'salvarMeuPix':{
@@ -293,3 +297,4 @@ module.exports=async(req,res)=>{
   }
 };
 module.exports._internals={publicUser,filtered,summary,catalog,action};
+

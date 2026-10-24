@@ -35,3 +35,16 @@ Fotos novas enviadas pelo painel já são salvas no Neon. Cada uma pode ter até
 - Cotações e solicitações de manutenção são gravadas no Neon. Para voltar a receber o aviso por e-mail, configure `RESEND_API_KEY`, `EMAIL_FROM` (remetente verificado) e `COTACOES_EMAIL` na Vercel e faça novo deploy. Se o envio falhar, a cotação fica registrada e aparece no WhatsApp.
 - Não apague a planilha nem a pasta de fotos até conferir a importação e a cópia das imagens.
 - O ZIP do código não contém a planilha, SQL com dados de pessoas, conexão do banco nem fotos privadas.
+
+
+## Chegadas e descontos por atraso
+
+A aba **Chegadas** é exclusiva de administradores. Antes do primeiro lançamento, edite cada funcionário em **Usuários** para conferir salário, entrada de segunda a sexta, entrada aos sábados, horas mensais (divisor do salário-hora; valor inicial 220, que deve corresponder à jornada contratada) e tolerância da entrada (inicial 5 minutos). O horário previsto também pode ser ajustado no lançamento diário para escalas específicas.
+
+Registre funcionário, data, entrada prevista e chegada real. O cálculo é `salário mensal / horas mensais / 60 × minutos descontáveis`, arredondado por lançamento para centavos. Se o atraso não exceder a tolerância, o desconto é zero; se exceder, considera todo o atraso. Entradas antecipadas não geram crédito. Abonos justificáveis zeram o desconto. Este recurso registra apenas entradas; não apura o ponto completo, saídas, compensação, faltas, DSR ou horas extras. Um dia sem lançamento não gera desconto. A tolerância de entrada não substitui a apuração das variações de todas as marcações do dia (CLT, art. 58, § 1º).
+
+Há um registro por funcionário e data. Para corrigir um registro existente, use **Corrigir** no histórico e informe a justificativa. Cancelamentos preservam os dados e o histórico; **Restaurar** permite reativar um registro cancelado. O histórico mostra autoria e instante de cada alteração. A base de salário, divisor e tolerância fica preservada a partir do primeiro lançamento; mudanças no cadastro valem para novos registros. Não edite um registro para outro funcionário ou data: cancele o lançamento incorreto e registre outro.
+
+O resumo mensal mostra atraso total, minutos descontáveis e desconto por funcionário. Em **Pagamentos**, o salário líquido e a baixa consideram `salário mensal − vales aprovados − descontos de atrasos`. O funcionário também vê o desconto e seu tempo descontável no resumo de pagamento. Para corrigir chegadas de um mês com salário pago, reabra o pagamento primeiro.
+
+**Banco de dados:** não é necessário executar SQL novo, alterar variáveis de ambiente ou repetir a importação. A coleção `ChegadasEquipe` é criada por gravação na tabela existente `ct_records`; configurações adicionais ficam no JSON de `Funcionarios`. A chave composta já existente impede duplicidade de funcionário/data; uma versão do registro impede sobrescritas de alterações feitas simultaneamente por administradores. O banco de produção não é acessado pelos testes.

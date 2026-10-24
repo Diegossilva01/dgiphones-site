@@ -492,3 +492,14 @@ body.dark-theme .profit-kpi{background:#151b22;border-color:#303945}body.dark-th
 body.dark-theme .lead-card{background:#151b22;border-color:#303945}body.dark-theme .lead-status{background:#27313c;color:#e4ebf4}body.dark-theme .lead-tab{background:#342b15;color:#ffd86a;border-color:#685119}body.dark-theme .lead-tab.active{background:#286354;color:#fff;border-color:#286354}
 @media(max-width:760px){.leads-filters{grid-template-columns:1fr}.lead-data{grid-template-columns:repeat(2,minmax(0,1fr))}.lead-card{padding:15px}.lead-footer .lead-save{width:100%}}
 @media(max-width:450px){.lead-data{grid-template-columns:1fr}.lead-actions select{min-width:0;width:100%}}
+
+
+/* Controle administrativo de chegadas */
+#page-chegadas .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+#page-chegadas .full{grid-column:1/-1}
+#page-chegadas .filters{grid-template-columns:180px minmax(180px,1fr) auto;align-items:end;margin-bottom:18px}
+#page-chegadas td{vertical-align:top}
+#page-chegadas td small{color:var(--muted);white-space:normal}
+#page-chegadas td .actions{flex-wrap:wrap;gap:6px}
+#page-chegadas .table-wrap{margin-top:18px}
+@media(max-width:760px){#page-chegadas .form-grid,#page-chegadas .filters{grid-template-columns:1fr}}
