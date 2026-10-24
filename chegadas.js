@@ -31,7 +31,7 @@
     $('#chegadasPeriodo').textContent=`${dataBR(inicio)} (5º dia útil de ${month.value.split('-').reverse().join('/')}) até ${dataBR(fim)} • ${people.length} funcionário(s).`;
     $('#chegadasPendentesQtd').textContent=pendentes.length;$('#chegadasPreenchidasQtd').textContent=filled.length;
     body.innerHTML=pendentes.map((p,i)=>{const d=draft(p),value=preview(p,d),f=p.funcionario;
-      return `<tr data-pending="${i}"><td><strong>${esc(dataBR(p.data))}</strong><br><small>${esc(new Date(p.data+'T12:00:00Z').toLocaleDateString('pt-BR',{weekday:'long',timeZone:'UTC'}))}${p.folga?' • folga prevista':''}</small></td><td>${esc(f.nome)}</td><td>${p.previsto?`<strong>${esc(p.previsto)}</strong><br><small>Tolerância: ${Number(basis(p).toleranciaMinutos??5)} min</small>`:'<span class="arrival-warning">Cadastre o horário em Usuários</span>'}${p.anterior?'<br><small>Registro cancelado: exige justificativa para reativar.</small>':''}</td><td><input type="time" data-field="chegada" aria-label="Chegada de ${esc(f.nome)} em ${esc(dataBR(p.data))}" value="${esc(d.chegada)}" ${!p.previsto?'disabled':''}></td><td><span data-result class="arrival-inline-result ${value?.atrasado?'late':value?'ontime':''}">${esc(resultText(value,d))}</span></td><td><label class="arrival-checkbox"><input type="checkbox" data-field="abonado" ${d.abonado?'checked':''}> Abonar atraso</label><input type="text" data-field="observacao" maxlength="1000" aria-label="Observação de ${esc(f.nome)} em ${esc(dataBR(p.data))}" value="${esc(d.observacao)}" placeholder="${p.anterior?'Justificativa da reativação':'Observação (obrigatória para abonar)'}"></td><td><button type="button" class="primary compact" data-save="${i}" ${!p.previsto?'disabled':''}>Salvar dia</button></td></tr>`;
+      return `<tr data-pending="${i}"><td><strong>${esc(dataBR(p.data))}</strong><br><small>${esc(new Date(p.data+'T12:00:00Z').toLocaleDateString('pt-BR',{weekday:'long',timeZone:'UTC'}))}${p.folga?' • folga prevista':''}</small></td><td>${esc(f.nome)}</td><td>${p.previsto?`<strong>${esc(p.previsto)}</strong><br><small>Tolerância: ${Number(basis(p).toleranciaMinutos??5)} min</small>`:'<span class="arrival-warning">Cadastre o horário em Usuários</span>'}${p.anterior?'<br><small>Registro cancelado: exige justificativa para reativar.</small>':''}</td><td><div class="arrival-quick-time"><input type="time" data-field="chegada" aria-label="Chegada de ${esc(f.nome)} em ${esc(dataBR(p.data))}" value="${esc(d.chegada)}" ${!p.previsto?'disabled':''}><button type="button" class="arrival-on-time" data-ontime="${i}" aria-label="Marcar ${esc(f.nome)} no horário previsto, ${esc(p.previsto)}, em ${esc(dataBR(p.data))}" ${!p.previsto?'disabled':''}>✓ No horário</button></div></td><td><span data-result class="arrival-inline-result ${value?.atrasado?'late':value?'ontime':''}">${esc(resultText(value,d))}</span></td><td><label class="arrival-checkbox"><input type="checkbox" data-field="abonado" ${d.abonado?'checked':''}> Abonar atraso</label><input type="text" data-field="observacao" maxlength="1000" aria-label="Observação de ${esc(f.nome)} em ${esc(dataBR(p.data))}" value="${esc(d.observacao)}" placeholder="${p.anterior?'Justificativa da reativação':'Observação (obrigatória para abonar)'}"></td><td><button type="button" class="primary compact" data-save="${i}" ${!p.previsto?'disabled':''}>Salvar dia</button></td></tr>`;
     }).join('')||'<tr><td colspan="7">Todos os dias deste período estão preenchidos ou pertencem a meses já pagos.</td></tr>';
     $('#salvarChegadasPreenchidas').disabled=!pendentes.length;
     history.innerHTML=filled.map((r,i)=>{const late=Number(r.atrasoMinutos)>Number(r.toleranciaMinutos??5),label=late?'Em atraso':r.atrasoMinutos?'Dentro da tolerância':'No horário';
@@ -70,18 +70,27 @@
     const chosen=items.map(p=>({p,d:{...draft(p)}}));
     if(!chosen.length){msg.textContent='Informe pelo menos um horário de chegada para salvar.';return}
     try{for(const {p,d} of chosen)validate(p,d)}catch(e){msg.textContent=e.message;return}
-    // Uma confirmação para o lote, mantendo a verificação de senha no servidor.
-    const senha=await pedirSenhaConfirmacao('salvarChegada');if(senha===null)return;setBusy(true);
+    setBusy(true);
     let saved=0,error='';
     try{
       for(const {p,d} of chosen){
-        try{const result=await api('salvarChegada',{idFuncionario:p.funcionario.id,data:p.data,previsto:p.previsto,chegada:d.chegada,abonado:d.abonado,observacao:d.observacao,versao:p.anterior?.versao||p.anterior?.atualizadoEm||'',senhaConfirmacao:senha});registros=registros.filter(r=>r.id!==result.registro.id);registros.push(result.registro);drafts.delete(p.id);saved++;msg.textContent=`Salvando: ${saved} de ${chosen.length}...`}
+        try{const result=await api('salvarChegada',{idFuncionario:p.funcionario.id,data:p.data,previsto:p.previsto,chegada:d.chegada,abonado:d.abonado,observacao:d.observacao,versao:p.anterior?.versao||p.anterior?.atualizadoEm||''});registros=registros.filter(r=>r.id!==result.registro.id);registros.push(result.registro);drafts.delete(p.id);saved++;msg.textContent=`Salvando: ${saved} de ${chosen.length}...`}
         catch(e){error=`${p.funcionario.nome} • ${dataBR(p.data)}: ${e.message}`;break}
       }
     }finally{setBusy(false);registros.sort((a,b)=>b.data.localeCompare(a.data)||a.nome.localeCompare(b.nome));render()}
     msg.textContent=`${saved} dia(s) salvo(s).${error?' '+error+' Os campos ainda não salvos foram preservados.':''}`;
   }
-  body.addEventListener('click',e=>{const b=e.target.closest('[data-save]');if(b)savePending([pendentes[Number(b.dataset.save)]])});
+  body.addEventListener('click',e=>{
+    if(busy||loading)return;
+    const quick=e.target.closest('[data-ontime]');
+    if(quick){
+      const p=pendentes[Number(quick.dataset.ontime)];if(!p?.previsto||quick.disabled)return;
+      const tr=quick.closest('[data-pending]'),input=tr.querySelector('[data-field=chegada]');
+      drafts.set(p.id,{...draft(p),abonado:false});tr.querySelector('[data-field=abonado]').checked=false;
+      input.value=p.previsto;input.dispatchEvent(new Event('input',{bubbles:true}));return;
+    }
+    const b=e.target.closest('[data-save]');if(b)savePending([pendentes[Number(b.dataset.save)]]);
+  });
   $('#salvarChegadasPreenchidas').addEventListener('click',()=>savePending(pendentes.filter(p=>draft(p).chegada)));
   function edit(r){
     if(paid(r)){ $('#chegadasMsg').textContent='Reabra o salário deste mês em Pagamentos antes de corrigir a chegada.';return }
@@ -108,3 +117,4 @@
   function nextDay(){if(isAdmin()&&!busy&&page.classList.contains('active')&&loadedDay&&loadedDay!==todaySP())load()}
   window.addEventListener('focus',nextDay);document.addEventListener('visibilitychange',()=>{if(!document.hidden)nextDay()});setInterval(nextDay,60000);
 })();
+

@@ -530,3 +530,10 @@ body.dark-theme .lead-card{background:#151b22;border-color:#303945}body.dark-the
 .dark-theme #page-chegadas .arrival-inline-result.ontime{color:#a1d8b2}
 .dark-theme #page-chegadas .arrival-inline-result.late,.dark-theme #page-chegadas .arrival-warning{color:#ffb5bf}
 @media(max-width:760px){#page-chegadas .arrival-period-filters{grid-template-columns:1fr}#page-chegadas .panel-head{align-items:stretch}#salvarChegadasPreenchidas{width:100%}}
+
+
+#page-chegadas .arrival-quick-time{display:flex;flex-direction:column;align-items:stretch;gap:7px;min-width:125px}
+#page-chegadas .arrival-on-time{border:1px solid #a5d4b3;border-radius:8px;background:#e5f6e9;color:#15532d;padding:8px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+#page-chegadas .arrival-on-time:hover{background:#d0eed9}
+#page-chegadas .arrival-on-time:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.dark-theme #page-chegadas .arrival-on-time{background:#173c29;color:#cff0d8;border-color:#326448}

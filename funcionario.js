@@ -17,7 +17,7 @@ const ACOES_RETRY_SEGURO=new Set([
 ]);
 const esperar=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const ACOES_CONFIRMAR_SENHA=new Set([
-  'salvarChegada','cadastrarCompra','excluirCompra','editarCompra',
+  'cadastrarCompra','excluirCompra','editarCompra',
   'atualizarProdutoSite','excluirProdutoSite',
   'cadastrarVenda','excluirVenda','editarVenda',
   'cadastrarFuncionario','excluirFuncionario','removerFuncionario','deletarFuncionario',
@@ -25,7 +25,6 @@ const ACOES_CONFIRMAR_SENHA=new Set([
   'solicitarVale','alterarStatusVale','cadastrarRevendedor','cadastrarOS','cadastrarNotaProduto'
 ]);
 const ROTULOS_CONFIRMACAO_SENHA={
-  salvarChegada:'salvar esta chegada ou correção',
   cadastrarCompra:'salvar esta compra',
   excluirCompra:'excluir esta compra',
   editarCompra:'alterar esta compra',
@@ -868,4 +867,5 @@ document.addEventListener('scroll',e=>{
   const index=Math.round(gallery.scrollLeft/Math.max(gallery.clientWidth,1));
   updateResellerGallery(wrap,index);
 },true);
+
 
