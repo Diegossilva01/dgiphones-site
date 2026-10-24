@@ -762,7 +762,7 @@ async function loadFuncionarios(){
     </tr>`).join(''):'<tr><td colspan="10">Nenhum funcionário cadastrado.</td></tr>';
   }catch(e){body.innerHTML='<tr><td colspan="10">Não foi possível carregar.</td></tr>';msg.textContent=e.message}
 }
-window.editarFuncionario=id=>{const x=(state.funcionarios||[]).find(f=>String(f.id)===String(id));if(!x)return;const f=$("#usuarioForm");f.idFuncionario.value=x.id;f.nome.value=x.nome||'';f.usuario.value=x.usuario||'';f.perfil.value=x.perfil||'Funcionário';f.salario.value=Number(x.salario||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});f.valeRefeicaoDia.value=Number(x.valeRefeicaoDia||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});f.diasSemana.value=String(x.diasSemana||6);f.horarioEntrada.value=x.horarioEntrada||'';f.horarioSabado.value=x.horarioSabado||'';f.horasMensais.value=x.horasMensais||220;f.toleranciaMinutos.value=x.toleranciaMinutos??5;f.status.value=x.status||'Ativo';f.senha.value='';f.senha.required=false;$("#senhaAjuda").textContent='Deixe em branco para manter a senha atual.';$("#usuarioFormTitulo").textContent='Editar funcionário';$("#salvarFuncionarioBtn").textContent='Salvar alterações';$("#cancelarEdicaoFuncionario").classList.remove('hidden');f.scrollIntoView({behavior:'smooth',block:'start'})};
+window.editarFuncionario=id=>{const x=(state.funcionarios||[]).find(f=>String(f.id)===String(id));if(!x)return;const f=$("#usuarioForm");f.idFuncionario.value=x.id;f.nome.value=x.nome||'';f.usuario.value=x.usuario||'';f.perfil.value=x.perfil||'Funcionário';f.salario.value=Number(x.salario||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});f.valeRefeicaoDia.value=Number(x.valeRefeicaoDia||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});f.diasSemana.value=String(x.diasSemana||6);f.horarioEntrada.value=x.horarioEntrada||'';f.horarioSabado.value=x.horarioSabado||'';f.horasMensais.value=x.horasMensais||220;f.toleranciaMinutos.value=x.toleranciaMinutos??10;f.status.value=x.status||'Ativo';f.senha.value='';f.senha.required=false;$("#senhaAjuda").textContent='Deixe em branco para manter a senha atual.';$("#usuarioFormTitulo").textContent='Editar funcionário';$("#salvarFuncionarioBtn").textContent='Salvar alterações';$("#cancelarEdicaoFuncionario").classList.remove('hidden');f.scrollIntoView({behavior:'smooth',block:'start'})};
 $("#cancelarEdicaoFuncionario")?.addEventListener('click',resetFuncionarioForm);
 window.excluirFuncionario=async(id,nome)=>{
   if(!confirm(`Excluir o cadastro de ${nome}? Essa pessoa perderá o acesso ao sistema.`))return;
@@ -867,5 +867,6 @@ document.addEventListener('scroll',e=>{
   const index=Math.round(gallery.scrollLeft/Math.max(gallery.clientWidth,1));
   updateResellerGallery(wrap,index);
 },true);
+
 
 

@@ -13,8 +13,8 @@ function setup(){
 const input={idFuncionario:'F1',data:'2026-10-23',previsto:'10:00',chegada:'10:30'};
 
 test('arrival calculations: early, on time, tolerance, threshold, hour and custom divisor',()=>{
-  for(const chegada of ['09:30','10:00','10:05'])assert.equal(attendance.calculate({previsto:'10:00',chegada,salario:2200,horasMensais:220}).desconto,0);
-  assert.equal(attendance.calculate({previsto:'10:00',chegada:'10:06',salario:2200,horasMensais:220}).desconto,1);
+  for(const chegada of ['09:30','10:00','10:05'])assert.equal(attendance.calculate({previsto:'10:00',chegada,salario:2200,horasMensais:220,toleranciaMinutos:5}).desconto,0);
+  assert.equal(attendance.calculate({previsto:'10:00',chegada:'10:06',salario:2200,horasMensais:220,toleranciaMinutos:5}).desconto,1);
   assert.equal(attendance.calculate({previsto:'10:00',chegada:'11:00',salario:2200,horasMensais:220}).desconto,10);
   assert.equal(attendance.calculate({previsto:'10:00',chegada:'10:30',salario:3000,horasMensais:200}).desconto,7.5);
   assert.equal(attendance.calculate({previsto:'10:00',chegada:'10:30',salario:2200,horasMensais:220,abonado:true}).desconto,0);
@@ -61,4 +61,24 @@ test('deduction flows into salary, advance balance and paid value, locking the m
   assert.equal((await finance.team(db,common,data,admin)).itens[0].salarioPendente,2095);
   await assert.rejects(attendance.list(db,common,{mes:'2026-10'},{perfil:'Funcionário'}),/administradores/);
   assert.equal((await attendance.list(db,common,{mes:'2026-09'},admin)).registros.length,0);
+});
+
+
+test('new arrivals use ten-minute tolerance even for an existing employee configured with five',async()=>{
+  const {db,records}=setup();records.Funcionarios[0]['Tolerância entrada']=5;
+  assert.equal(attendance.settings(records.Funcionarios[0]).toleranciaMinutos,10);
+  assert.equal(attendance.settingsInput({toleranciaMinutos:5})['Tolerância entrada'],10);
+  for(const delay of [5,6,9,10]){
+    const result=attendance.calculate({previsto:'10:00',chegada:`10:${String(delay).padStart(2,'0')}`,salario:2200,horasMensais:220});assert.equal(result.desconto,0);
+  }
+  const saved=await attendance.save(db,common,{...input,chegada:'10:10'},admin);
+  assert.equal(saved.registro.toleranciaMinutos,10);assert.equal(saved.registro.desconto,0);
+  assert.equal(attendance.calculate({previsto:'10:00',chegada:'10:11',salario:2200,horasMensais:220}).desconto,1.83);
+});
+
+test('new tolerance policy preserves the saved calculation basis of older arrivals',async()=>{
+  const {db,records}=setup();
+  records.ChegadasEquipe.push({id:'F1:2026-10-23',idFuncionario:'F1',data:'2026-10-23',previsto:'10:00',chegada:'10:06',salario:2200,horasMensais:220,toleranciaMinutos:5,atrasoMinutos:6,minutosDescontados:6,desconto:1,versao:'old-five',historico:[]});
+  const result=await attendance.save(db,common,{...input,chegada:'10:06',versao:'old-five',observacao:'Conferência do registro antigo'},admin);
+  assert.equal(result.registro.toleranciaMinutos,5);assert.equal(result.registro.desconto,1);
 });

@@ -39,7 +39,7 @@ Fotos novas enviadas pelo painel já são salvas no Neon. Cada uma pode ter até
 
 ## Chegadas e descontos por atraso
 
-A aba **Chegadas** é exclusiva de administradores. Em **Usuários**, confira salário, entrada de segunda a sexta, entrada aos sábados, horas mensais para cálculo e tolerância de entrada. O divisor inicial é 220 e deve corresponder à jornada contratada; a tolerância inicial é 5 minutos.
+A aba **Chegadas** é exclusiva de administradores. Em **Usuários**, confira salário, entrada de segunda a sexta, entrada aos sábados, horas mensais para cálculo e tolerância de entrada. O divisor inicial é 220 e deve corresponder à jornada contratada; a tolerância de entrada é de pelo menos 10 minutos. Cadastros anteriores com 5 minutos passam a usar 10 nos novos lançamentos, sem exigir alteração manual no banco. Registros já salvos conservam a tolerância e os valores originais.
 
 O controle usa duas tabelas. **Dias para preencher** gera automaticamente uma linha por funcionário e dia previsto de trabalho. O período começa no **5º dia útil do mês selecionado** e termina na data atual de São Paulo; inicialmente o mês selecionado é o anterior. A contagem segue o financeiro existente, incluindo sábado e excluindo domingo e os feriados já tratados pelo sistema. O campo de mês permite mudar o início do período; não é preciso selecionar a data de cada lançamento. A consulta aceita até um ano de intervalo.
 
@@ -54,3 +54,4 @@ O cálculo é `salário mensal / horas mensais / 60 × minutos descontáveis`, a
 O período exibido organiza o preenchimento. Os descontos continuam vinculados ao mês de cada ocorrência em **Pagamentos**, e o salário líquido e a baixa consideram salário mensal menos vales aprovados e atrasos. O funcionário vê o desconto e o tempo descontável no seu resumo de pagamento.
 
 **Banco:** não é necessário SQL novo, alteração de variáveis de ambiente ou nova importação. Registros e histórico continuam em `ChegadasEquipe` na tabela `ct_records`; as configurações ficam no JSON de `Funcionarios`. A chave única por funcionário/data e o controle de versão preservam a proteção contra duplicidade e sobrescritas. As linhas pendentes são calculadas, sem inserir lançamentos ou descontos antecipadamente no banco. Os testes não acessam produção.
+
