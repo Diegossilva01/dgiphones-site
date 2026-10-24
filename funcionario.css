@@ -537,3 +537,17 @@ body.dark-theme .lead-card{background:#151b22;border-color:#303945}body.dark-the
 #page-chegadas .arrival-on-time:hover{background:#d0eed9}
 #page-chegadas .arrival-on-time:focus-visible{outline:2px solid currentColor;outline-offset:2px}
 .dark-theme #page-chegadas .arrival-on-time{background:#173c29;color:#cff0d8;border-color:#326448}
+
+
+/* Consulta pessoal: horários e desconto, sem ações de alteração. */
+#minhasChegadasPanel .my-arrivals-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+#minhasChegadasPanel .my-arrivals-summary article{border:1px solid var(--border);border-radius:12px;padding:16px;background:var(--bg)}
+#minhasChegadasPanel .my-arrivals-summary span{display:block;color:var(--muted);font-size:12px}
+#minhasChegadasPanel .my-arrivals-summary strong{display:block;margin-top:8px;font-size:22px}
+#minhasChegadasPanel .my-arrivals-note{color:var(--muted);font-size:12px;line-height:1.5;margin:15px 0 0}
+#minhasChegadasBody tr.arrival-row-ontime>td{background:#e5f6e9;color:#15532d;border-bottom-color:#b7dfc2}
+#minhasChegadasBody tr.arrival-row-late>td{background:#fde6e8;color:#8e1d29;border-bottom-color:#f1bcc2}
+#minhasChegadasBody small{font-size:11px;white-space:normal}
+.dark-theme #minhasChegadasBody tr.arrival-row-ontime>td{background:#173c29;color:#cff0d8;border-bottom-color:#326448}
+.dark-theme #minhasChegadasBody tr.arrival-row-late>td{background:#4b232d;color:#ffd3d9;border-bottom-color:#79404b}
+@media(max-width:650px){#minhasChegadasPanel .my-arrivals-summary{grid-template-columns:1fr}}

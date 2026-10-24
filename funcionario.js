@@ -11,7 +11,7 @@ const podeEditar=r=>isAdmin()||String(r?.['ID Funcionário']||'')===String(state
 const API_TIMEOUT_MS=25000;
 const API_TENTATIVAS_LEITURA=4;
 const ACOES_RETRY_SEGURO=new Set([
-  'listarChegadas','verificarToken','dashboard','dadosSistema','listarCompras','listarEstoque',
+  'listarMinhasChegadas','listarChegadas','verificarToken','dashboard','dadosSistema','listarCompras','listarEstoque',
   'listarProdutosSite','listarCatalogoRevendedor','listarVendas','listarFuncionarios',
   'listarFinanceiroEquipe','listarVendasComissao','listarVales','listarRevendedores','listarOS','listarLeadsSite','localizarOSContato'
 ]);
@@ -465,6 +465,7 @@ async function loadComissao(){
   if(!mesEl.value)mesEl.value=mesAtual();const mes=mesEl.value;
 
   if(!isAdmin()){
+    loadMinhasChegadas(mes);
     const workerMsg=$("#workerCommissionMsg"),workerBody=$("#workerCommissionSalesBody");
     if(workerMsg)workerMsg.textContent='Atualizando suas comissões...';
     if(workerBody)workerBody.innerHTML='<tr><td colspan="7">Carregando...</td></tr>';
@@ -533,6 +534,27 @@ async function loadValesAdmin(mes){
     body.innerHTML=lista.length?lista.map(v=>{const actions=`<div class="commission-sale-actions">${v.status!=='Aprovado'?`<button class="mini-action approve" onclick="alterarStatusVale('${esc(v.id)}','Aprovado','${mes}')"><i class="fa-solid fa-check"></i> Aprovar</button>`:''}${v.status!=='Negado'?`<button class="mini-action reject" onclick="alterarStatusVale('${esc(v.id)}','Negado','${mes}')"><i class="fa-solid fa-xmark"></i> Negar</button>`:''}${v.status!=='Pendente'?`<button class="mini-action" onclick="alterarStatusVale('${esc(v.id)}','Pendente','${mes}')"><i class="fa-solid fa-rotate-left"></i> Reabrir</button>`:''}</div>`;return `<tr><td>${esc(v.dataSolicitacao||'—')}</td><td><strong>${esc(v.funcionario||'—')}</strong></td><td><strong>${money(v.valor||0)}</strong></td><td>${esc(v.motivo||'—')}</td><td>${badgeVale(v.status)}</td><td>${v.decididoPor?`${esc(v.decididoPor)}<br><small>${esc(v.dataDecisao||'')}</small>`:'—'}</td><td>${actions}</td></tr>`}).join(''):'<tr><td colspan="7">Nenhuma solicitação de vale neste mês.</td></tr>';
     if(msg)msg.textContent=`${lista.length} solicitação${lista.length===1?'':'ões'} no período.`;
   }catch(e){body.innerHTML='<tr><td colspan="7">Não foi possível carregar as solicitações.</td></tr>';if(msg)msg.textContent=e.message}
+}
+let minhasChegadasRequest=0;
+async function loadMinhasChegadas(mes){
+  if(isAdmin()||isRevendedor())return;
+  const body=$('#minhasChegadasBody'),msg=$('#minhasChegadasMsg');if(!body)return;
+  const seq=++minhasChegadasRequest,id=state.user?.id;
+  body.innerHTML='<tr><td colspan="6">Carregando suas chegadas...</td></tr>';
+  $('#minhasChegadasDesconto').textContent='—';$('#minhasChegadasTempo').textContent='—';$('#minhasChegadasDias').textContent='—';if(msg)msg.textContent='';
+  try{
+    const j=await api('listarMinhasChegadas',{mes});
+    if(seq!==minhasChegadasRequest||id!==state.user?.id||isAdmin()||$('#pagamentosMes')?.value!==mes)return;
+    const duration=n=>`${Math.floor(Number(n||0)/60)}h ${Number(n||0)%60}min`;
+    $('#minhasChegadasDesconto').textContent=money(j.resumo?.descontoAtrasos||0);
+    $('#minhasChegadasTempo').textContent=duration(j.resumo?.minutosDescontados);
+    $('#minhasChegadasDias').textContent=String(j.resumo?.diasRegistrados||0);
+    body.innerHTML=(j.registros||[]).map(r=>{
+      const late=Number(r.atrasoMinutos)>Number(r.toleranciaMinutos),label=late?'Em atraso':Number(r.atrasoMinutos)?'Dentro da tolerância':'No horário';
+      return `<tr class="${late?'arrival-row-late':'arrival-row-ontime'}"><td>${esc(dataBR(r.data))}</td><td>${esc(r.previsto)}</td><td><strong>${esc(r.chegada)}</strong></td><td><strong>${label}</strong><br><small>${duration(r.atrasoMinutos)} • tolerância de ${Number(r.toleranciaMinutos)} min${r.abonado?' • Abonado':''}</small></td><td>${duration(r.minutosDescontados)}</td><td><strong>${money(r.desconto||0)}</strong></td></tr>`;
+    }).join('')||'<tr><td colspan="6">Nenhuma chegada registrada para você neste mês.</td></tr>';
+    if(msg)msg.textContent=`Consulta de ${mes.split('-').reverse().join('/')}. Os descontos são somados no mês de cada chegada.`;
+  }catch(e){if(seq!==minhasChegadasRequest||id!==state.user?.id)return;body.innerHTML='<tr><td colspan="6">Não foi possível carregar suas chegadas.</td></tr>';if(msg)msg.textContent=e.message}
 }
 async function loadPagamentos(){
   const mesEl=$("#pagamentosMes");if(!mesEl)return;
@@ -867,6 +889,7 @@ document.addEventListener('scroll',e=>{
   const index=Math.round(gallery.scrollLeft/Math.max(gallery.clientWidth,1));
   updateResellerGallery(wrap,index);
 },true);
+
 
 
 

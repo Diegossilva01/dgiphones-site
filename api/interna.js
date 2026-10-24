@@ -242,6 +242,7 @@ async function action(a,d,u){
       const idNota=c.id('RECIBO');r={'ID Nota':idNota,'Data da venda':c.br(d.dataVenda),'Data de cadastro':c.now(),'Nome do cliente':c.text(d.nome),CPF:d.cpf?c.cpf(d.cpf):'',Telefone:c.text(d.telefone),'Acessório vendido':c.text(d.produto),Quantidade:Number(d.quantidade), 'Valor total':c.money(d.valor),'Forma de pagamento':c.text(d.formaPagamento),'Garantia (dias)':Number(d.garantiaDias)||0,'Observações':c.text(d.observacoes),'Funcionário responsável':u.nome,'ID Funcionário':u.id};
       await db.add('RecibosAcessorios',idNota,r);return {sucesso:true,idNota,mensagem:'Recibo salvo.'};
     }
+    case 'listarMinhasChegadas':return attendance.myHistory(db,c,d,u);
     case 'listarChegadas':return attendance.list(db,c,d,u);
     case 'salvarChegada':return attendance.save(db,c,d,u);
     case 'listarFuncionarios':requiredAdmin(u);return {sucesso:true,funcionarios:(await list('Funcionarios')).map(publicUser)};
@@ -297,5 +298,6 @@ module.exports=async(req,res)=>{
   }
 };
 module.exports._internals={publicUser,filtered,summary,catalog,action};
+
 
 
