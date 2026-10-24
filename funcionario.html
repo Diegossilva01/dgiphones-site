@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="./funcionario.css?v=20261024-tolerancia10">
+  <link rel="stylesheet" href="./funcionario.css?v=20261024-minhas-chegadas">
 </head>
 <body>
 <section id="loginScreen" class="login-screen">
@@ -383,6 +383,18 @@
         <p id="workerFinanceMsg" class="message"></p>
       </div>
 
+      <div id="minhasChegadasPanel" class="panel worker-only">
+        <div class="panel-head"><div><span class="eyebrow">Minhas chegadas</span><h2>Histórico de chegadas e atrasos</h2><p class="commission-note">Confira seus horários e descontos no mês selecionado acima. Esta área é somente para consulta.</p></div></div>
+        <div class="my-arrivals-summary">
+          <article><span>Desconto total no mês</span><strong id="minhasChegadasDesconto">—</strong></article>
+          <article><span>Tempo descontado</span><strong id="minhasChegadasTempo">—</strong></article>
+          <article><span>Dias registrados</span><strong id="minhasChegadasDias">—</strong></article>
+        </div>
+        <p class="my-arrivals-note">Verde: no horário ou dentro da tolerância. Vermelho: atraso acima da tolerância. Atrasos abonados não geram desconto.</p>
+        <div class="table-wrap"><table><thead><tr><th>Data</th><th>Entrada prevista</th><th>Chegada real</th><th>Situação</th><th>Tempo descontado</th><th>Desconto</th></tr></thead><tbody id="minhasChegadasBody"><tr><td colspan="6">Selecione o mês para consultar.</td></tr></tbody></table></div>
+        <p id="minhasChegadasMsg" class="message" role="status"></p>
+      </div>
+
       <div id="pixPanel" class="panel worker-only pix-panel">
         <div class="panel-head"><div><h2>Minha chave Pix</h2><p class="commission-note">Esta é a chave usada para seus pagamentos.</p></div></div>
         <div id="pixSavedView" class="pix-saved hidden">
@@ -594,12 +606,13 @@
 
 <div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-<script src="funcionario.js?v=20261024-tolerancia10"></script>
-<script src="chegadas-dias.js?v=20261024-tolerancia10"></script>
-<script src="chegadas.js?v=20261024-tolerancia10"></script>
+<script src="funcionario.js?v=20261024-minhas-chegadas"></script>
+<script src="chegadas-dias.js?v=20261024-minhas-chegadas"></script>
+<script src="chegadas.js?v=20261024-minhas-chegadas"></script>
 <script src="atendimentos.js?v=20260929-leads3"></script>
 </body>
 </html>
+
 
 
 
