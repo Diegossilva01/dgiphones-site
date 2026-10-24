@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="./funcionario.css?v=20261024-rapido1">
+  <link rel="stylesheet" href="./funcionario.css?v=20261024-tolerancia10">
 </head>
 <body>
 <section id="loginScreen" class="login-screen">
@@ -559,7 +559,7 @@
           <label>Entrada de segunda a sexta<input name="horarioEntrada" type="time"><small>Usado para preencher o horário previsto nas chegadas.</small></label>
           <label>Entrada aos sábados<input name="horarioSabado" type="time"><small>Se vazio, usa a entrada de segunda a sexta.</small></label>
           <label>Horas mensais para cálculo<input name="horasMensais" type="number" min="0.01" max="744" step="0.01" value="220" required><small>Informe o divisor da jornada contratada de cada funcionário.</small></label>
-          <label>Tolerância da entrada (minutos)<input name="toleranciaMinutos" type="number" min="5" max="120" value="5" required></label>
+          <label>Tolerância da entrada (minutos)<input name="toleranciaMinutos" type="number" min="10" max="120" value="10" required></label>
           <label>Status<select name="status"><option value="Ativo">Ativo</option><option value="Inativo">Inativo</option></select></label>
           <div class="full actions"><button class="primary" id="salvarFuncionarioBtn">Cadastrar funcionário</button><button type="button" class="secondary hidden" id="cancelarEdicaoFuncionario">Cancelar edição</button><span class="message form-message"></span></div>
         </form>
@@ -594,12 +594,13 @@
 
 <div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-<script src="funcionario.js?v=20261024-rapido1"></script>
-<script src="chegadas-dias.js?v=20261024-rapido1"></script>
-<script src="chegadas.js?v=20261024-rapido1"></script>
+<script src="funcionario.js?v=20261024-tolerancia10"></script>
+<script src="chegadas-dias.js?v=20261024-tolerancia10"></script>
+<script src="chegadas.js?v=20261024-tolerancia10"></script>
 <script src="atendimentos.js?v=20260929-leads3"></script>
 </body>
 </html>
+
 
 
 

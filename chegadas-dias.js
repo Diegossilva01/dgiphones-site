@@ -26,10 +26,11 @@
     }
     return items;
   }
-  function calculation({previsto,chegada,salario,horasMensais=220,toleranciaMinutos=5,abonado=false}){
+  function calculation({previsto,chegada,salario,horasMensais=220,toleranciaMinutos=10,abonado=false}){
     if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(previsto)||!/^([01]\d|2[0-3]):[0-5]\d$/.test(chegada))return null;
     const minutes=v=>Number(v.slice(0,2))*60+Number(v.slice(3)),atraso=Math.max(0,minutes(chegada)-minutes(previsto)),atrasado=atraso>Number(toleranciaMinutos);
     return {atraso,atrasado,desconto:Math.round((abonado||!atrasado?0:Number(salario)/Number(horasMensais)/60*atraso)*100)/100};
   }
   return {initialMonth,fifthBusinessDay,pending,calculation};
 });
+
