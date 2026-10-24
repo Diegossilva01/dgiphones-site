@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="./funcionario.css?v=20261024-chegadas">
+  <link rel="stylesheet" href="./funcionario.css?v=20261024-dias1">
 </head>
 <body>
 <section id="loginScreen" class="login-screen">
@@ -509,26 +509,38 @@
 
     <section id="page-chegadas" class="page admin-only">
       <div class="panel">
-        <div class="panel-head"><div><h2>Registrar chegada</h2><p class="commission-note">Registre a entrada de cada funcionário. O desconto entra automaticamente no salário do mês de referência.</p></div></div>
+        <div class="panel-head"><div><h2>Chegadas da equipe</h2><p class="commission-note">As datas já ficam prontas. Preencha só a chegada real; a entrada prevista vem do cadastro do funcionário.</p></div></div>
+        <div class="filters arrival-period-filters">
+          <label>Desde o pagamento de<input type="month" id="chegadasMes"></label>
+          <label>Funcionário<select id="chegadasFuncionario"><option value="">Todos os funcionários</option></select></label>
+          <button type="button" class="secondary" id="atualizarChegadas">Atualizar</button>
+        </div>
+        <label class="arrival-checkbox"><input type="checkbox" id="chegadasIncluirFolgas"> Mostrar também os dias de folga previstos</label>
+        <p id="chegadasPeriodo" class="arrival-period-note" role="status"></p>
+        <p class="arrival-period-note">Meses com salário já pago não geram pendências. Dias sem registro não geram desconto automático.</p>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h2>Dias para preencher <span id="chegadasPendentesQtd" class="arrival-count">0</span></h2><p class="commission-note">Ao salvar, o dia sai desta tabela e passa para os dias preenchidos.</p></div><button type="button" class="primary" id="salvarChegadasPreenchidas">Salvar preenchidos</button></div>
+        <div class="table-wrap"><table class="arrival-pending-table"><thead><tr><th>Data</th><th>Funcionário</th><th>Entrada prevista</th><th>Chegada real</th><th>Atraso / desconto</th><th>Abono e observação</th><th>Ação</th></tr></thead><tbody id="chegadasPendentesBody"><tr><td colspan="7">Carregando dias...</td></tr></tbody></table></div>
+        <p id="chegadasPendentesMsg" class="message" role="status"></p>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h2>Dias preenchidos <span id="chegadasPreenchidasQtd" class="arrival-count">0</span></h2><p class="commission-note">Verde: no horário ou dentro da tolerância. Vermelho: atraso acima da tolerância. Abonos ficam identificados, sem desconto.</p></div></div>
+        <p id="chegadasResumo" class="arrival-period-note" role="status"></p>
+        <div class="table-wrap"><table><thead><tr><th>Data</th><th>Funcionário</th><th>Previsto</th><th>Chegada</th><th>Situação</th><th>Desconto</th><th>Observação</th><th>Ações</th></tr></thead><tbody id="chegadasBody"><tr><td colspan="8">Carregando registros...</td></tr></tbody></table></div>
+        <p id="chegadasMsg" class="message" role="status"></p>
+      </div>
+      <div id="chegadaEdicaoPanel" class="panel hidden">
+        <div class="panel-head"><div><h2>Corrigir chegada</h2><p id="chegadaEdicaoTitulo" class="commission-note"></p></div></div>
         <form id="chegadaForm" class="form-grid">
-          <label>Funcionário<select name="idFuncionario" required><option value="">Selecione</option></select></label>
-          <label>Data<input type="date" name="data" required></label>
+          <input type="hidden" name="idFuncionario"><input type="hidden" name="data">
           <label>Entrada prevista<input type="time" name="previsto" required></label>
           <label>Chegada real<input type="time" name="chegada" required></label>
           <label>Tratamento<select name="tratamento"><option value="descontar">Calcular atraso</option><option value="abonar">Abonar atraso (sem desconto)</option></select></label>
-          <label>Observação / justificativa<input name="observacao" maxlength="1000" placeholder="Obrigatória ao corrigir, abonar ou cancelar"></label>
-          <p id="chegadaCalculo" class="full commission-note">Configure o horário de entrada e as horas mensais na aba Usuários.</p>
-          <div class="full actions"><button type="submit" class="primary">Salvar chegada</button><button type="button" id="cancelarEdicaoChegada" class="secondary">Limpar</button><span class="message form-message" role="status"></span></div>
+          <label>Justificativa<input name="observacao" maxlength="1000" required placeholder="Informe o motivo da correção"></label>
+          <p id="chegadaCalculo" class="full arrival-period-note"></p>
+          <div class="full actions"><button type="submit" class="primary">Salvar correção</button><button type="button" id="cancelarEdicaoChegada" class="secondary">Fechar</button><span class="message form-message" role="status"></span></div>
         </form>
-        <p class="commission-note">Cálculo: salário mensal ÷ horas mensais ÷ 60 × minutos descontáveis. Até a tolerância de entrada, o desconto é zero; acima dela, conta o atraso inteiro. Este controle registra apenas chegadas; não apura saídas, compensações ou o limite de variações do ponto completo. Sem registro não gera falta nem desconto.</p>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><div><h2>Histórico de chegadas</h2><p class="commission-note">Correções e cancelamentos preservam o histórico. Meses com salário pago precisam ser reabertos em Pagamentos.</p></div></div>
-        <div class="filters"><label>Mês<input type="month" id="chegadasMes"></label><label>Funcionário<select id="chegadasFuncionario"><option value="">Todos</option></select></label><button type="button" class="secondary" id="atualizarChegadas">Atualizar</button></div>
-        <p id="chegadasResumo" class="commission-note" role="status"></p>
-        <div class="table-wrap"><table><thead><tr><th>Funcionário</th><th>Dias registrados</th><th>Atraso total</th><th>Tempo descontável</th><th>Desconto no mês</th></tr></thead><tbody id="chegadasTotaisBody"></tbody></table></div>
-        <div class="table-wrap"><table><thead><tr><th>Data</th><th>Funcionário</th><th>Previsto</th><th>Chegada</th><th>Atraso</th><th>Desconto</th><th>Registro</th><th>Ações</th></tr></thead><tbody id="chegadasBody"><tr><td colspan="8">Selecione o mês para carregar.</td></tr></tbody></table></div>
-        <p id="chegadasMsg" class="message" role="status"></p>
       </div>
     </section>
 
@@ -582,9 +594,11 @@
 
 <div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-<script src="funcionario.js?v=20261024-chegadas"></script>
-<script src="chegadas.js?v=20261024-chegadas"></script>
+<script src="funcionario.js?v=20261024-dias1"></script>
+<script src="chegadas-dias.js?v=20261024-dias1"></script>
+<script src="chegadas.js?v=20261024-dias1"></script>
 <script src="atendimentos.js?v=20260929-leads3"></script>
 </body>
 </html>
+
 

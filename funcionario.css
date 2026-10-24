@@ -503,3 +503,30 @@ body.dark-theme .lead-card{background:#151b22;border-color:#303945}body.dark-the
 #page-chegadas td .actions{flex-wrap:wrap;gap:6px}
 #page-chegadas .table-wrap{margin-top:18px}
 @media(max-width:760px){#page-chegadas .form-grid,#page-chegadas .filters{grid-template-columns:1fr}}
+
+
+/* Pendências diárias e situação de cada chegada */
+#page-chegadas .arrival-period-filters{grid-template-columns:minmax(180px,240px) minmax(180px,1fr) auto}
+#page-chegadas .arrival-checkbox{display:flex;flex-direction:row;align-items:center;gap:8px;font-weight:500;margin:12px 0}
+#page-chegadas .arrival-checkbox input{width:18px;height:18px;flex-shrink:0}
+#page-chegadas .arrival-period-note{font-size:13px;line-height:1.5;color:var(--muted);margin:12px 0 0;white-space:normal}
+#page-chegadas .arrival-count{display:inline-block;background:var(--bg);border:1px solid var(--border);padding:3px 9px;border-radius:99px;font-size:13px;vertical-align:middle}
+#page-chegadas .arrival-pending-table{min-width:1000px}
+#page-chegadas .arrival-pending-table input[type=time]{min-width:115px}
+#page-chegadas .arrival-pending-table input[type=text]{min-width:210px}
+#page-chegadas .arrival-pending-table .arrival-checkbox{margin:0 0 8px}
+#page-chegadas .arrival-inline-result{display:block;min-width:150px;max-width:210px;white-space:normal;font-size:12px;line-height:1.5}
+#page-chegadas .arrival-warning,#page-chegadas .arrival-inline-result.late{color:#a6212a}
+#page-chegadas .arrival-inline-result.ontime{color:#176437}
+#page-chegadas #chegadasBody tr.arrival-row-ontime>td{background:#e5f6e9;color:#15532d;border-bottom-color:#b7dfc2}
+#page-chegadas #chegadasBody tr.arrival-row-late>td{background:#fde6e8;color:#8e1d29;border-bottom-color:#f1bcc2}
+#page-chegadas #chegadasBody tr.arrival-row-ontime>td small{color:#28623e}
+#page-chegadas #chegadasBody tr.arrival-row-late>td small{color:#973a44}
+#page-chegadas button:disabled{opacity:.45;cursor:default}
+.dark-theme #page-chegadas #chegadasBody tr.arrival-row-ontime>td{background:#173c29;color:#cff0d8;border-bottom-color:#326448}
+.dark-theme #page-chegadas #chegadasBody tr.arrival-row-late>td{background:#4b232d;color:#ffd3d9;border-bottom-color:#79404b}
+.dark-theme #page-chegadas #chegadasBody tr.arrival-row-ontime>td small{color:#b0d2ba}
+.dark-theme #page-chegadas #chegadasBody tr.arrival-row-late>td small{color:#eab5bf}
+.dark-theme #page-chegadas .arrival-inline-result.ontime{color:#a1d8b2}
+.dark-theme #page-chegadas .arrival-inline-result.late,.dark-theme #page-chegadas .arrival-warning{color:#ffb5bf}
+@media(max-width:760px){#page-chegadas .arrival-period-filters{grid-template-columns:1fr}#page-chegadas .panel-head{align-items:stretch}#salvarChegadasPreenchidas{width:100%}}

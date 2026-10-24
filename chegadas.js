@@ -1,53 +1,110 @@
-// Controle de chegadas disponível apenas no painel administrativo.
+// Pendências geradas pela data atual; lançamentos só são gravados após confirmação.
 (() => {
-  const form=$('#chegadaForm');if(!form)return;
-  let registros=[],equipe=[],editando=null,request=0;
+  const page=$('#page-chegadas'),form=$('#chegadaForm');if(!page||!form)return;
+  const dates=ChegadasDias,month=$('#chegadasMes'),filter=$('#chegadasFuncionario');
+  const body=$('#chegadasPendentesBody'),history=$('#chegadasBody');
+  const drafts=new Map();let equipe=[],registros=[],mesesPagos=[],pendentes=[],editando=null,request=0,busy=false,loading=false,loadedDay='';
+  const todaySP=()=>new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'});
   const duration=n=>`${Math.floor(n/60)}h ${n%60}min`;
-  const spToday=()=>new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'});
-  const field=name=>form.elements.namedItem(name);
-  function reset(){form.reset();editando=null;field('idFuncionario').disabled=false;field('data').disabled=false;field('data').value=spToday();field('data').max=spToday();setMsg(form,'');preview()}
-  function expected(){
-    if(editando)return;
-    const f=equipe.find(x=>x.id===field('idFuncionario').value),day=new Date(`${field('data').value}T12:00:00`).getDay();
-    field('previsto').value=(day===6?f?.horarioSabado||f?.horarioEntrada:f?.horarioEntrada)||'';preview();
+  const field=n=>form.elements.namedItem(n);
+  const selectedPeople=()=>equipe.filter(f=>!filter.value||f.id===filter.value);
+  const paid=r=>mesesPagos.some(p=>p.idFuncionario===r.idFuncionario&&p.mes===r.data.slice(0,7));
+  const draft=p=>drafts.get(p.id)||{chegada:'',abonado:false,observacao:''};
+  const basis=p=>p.anterior||p.funcionario;
+  function preview(p,d){return dates.calculation({previsto:p.previsto,chegada:d.chegada,salario:basis(p).salario,horasMensais:basis(p).horasMensais||220,toleranciaMinutos:basis(p).toleranciaMinutos??5,abonado:d.abonado})}
+  function resultText(value,d){
+    if(!value)return 'Informe a chegada';
+    return `${value.atrasado?'Atraso':'Dentro da tolerância'}: ${duration(value.atraso)} • ${money(value.desconto)}${d.abonado?' • Abonado':''}`;
   }
-  function preview(){
-    const f=equipe.find(x=>x.id===field('idFuncionario').value),base=editando||f;
-    const p=field('previsto').value,a=field('chegada').value,el=$('#chegadaCalculo');
-    if(!base||!p||!a){el.textContent='Configure o horário previsto e informe a chegada para conferir o cálculo.';return}
-    const mins=v=>Number(v.slice(0,2))*60+Number(v.slice(3)),atraso=Math.max(0,mins(a)-mins(p)),tolerancia=Number(base.toleranciaMinutos??5),descontar=field('tratamento').value!=='abonar'&&atraso>tolerancia?atraso:0;
-    const salario=Number(base.salario||0),horas=Number(base.horasMensais||220);
-    el.textContent=`Atraso: ${duration(atraso)} • Descontável: ${duration(descontar)} • Desconto: ${money(salario/horas/60*descontar)} • Base: ${money(salario)} / ${horas}h • Tolerância: ${tolerancia}min${editando?' • Base preservada do registro original':''}.`;
+  function setBusy(value){
+    busy=value;
+    for(const el of page.querySelectorAll('input,select,button')){
+      if(value){el.dataset.busyDisabled=String(el.disabled);el.disabled=true}
+      else if(el.dataset.busyDisabled!==undefined){el.disabled=el.dataset.busyDisabled==='true';delete el.dataset.busyDisabled}
+    }
+  }
+  function closeEdit(){editando=null;form.reset();$('#chegadaEdicaoPanel').classList.add('hidden');setMsg(form,'')}
+  function render(){
+    const inicio=dates.fifthBusinessDay(month.value),fim=todaySP(),people=selectedPeople();
+    const all=registros.filter(r=>!filter.value||r.idFuncionario===filter.value),filled=all.filter(r=>!r.cancelado);
+    pendentes=dates.pending({inicio,fim,funcionarios:people,registros:all,mesesPagos,incluirFolgas:$('#chegadasIncluirFolgas').checked});
+    $('#chegadasPeriodo').textContent=`${dataBR(inicio)} (5º dia útil de ${month.value.split('-').reverse().join('/')}) até ${dataBR(fim)} • ${people.length} funcionário(s).`;
+    $('#chegadasPendentesQtd').textContent=pendentes.length;$('#chegadasPreenchidasQtd').textContent=filled.length;
+    body.innerHTML=pendentes.map((p,i)=>{const d=draft(p),value=preview(p,d),f=p.funcionario;
+      return `<tr data-pending="${i}"><td><strong>${esc(dataBR(p.data))}</strong><br><small>${esc(new Date(p.data+'T12:00:00Z').toLocaleDateString('pt-BR',{weekday:'long',timeZone:'UTC'}))}${p.folga?' • folga prevista':''}</small></td><td>${esc(f.nome)}</td><td>${p.previsto?`<strong>${esc(p.previsto)}</strong><br><small>Tolerância: ${Number(basis(p).toleranciaMinutos??5)} min</small>`:'<span class="arrival-warning">Cadastre o horário em Usuários</span>'}${p.anterior?'<br><small>Registro cancelado: exige justificativa para reativar.</small>':''}</td><td><input type="time" data-field="chegada" aria-label="Chegada de ${esc(f.nome)} em ${esc(dataBR(p.data))}" value="${esc(d.chegada)}" ${!p.previsto?'disabled':''}></td><td><span data-result class="arrival-inline-result ${value?.atrasado?'late':value?'ontime':''}">${esc(resultText(value,d))}</span></td><td><label class="arrival-checkbox"><input type="checkbox" data-field="abonado" ${d.abonado?'checked':''}> Abonar atraso</label><input type="text" data-field="observacao" maxlength="1000" aria-label="Observação de ${esc(f.nome)} em ${esc(dataBR(p.data))}" value="${esc(d.observacao)}" placeholder="${p.anterior?'Justificativa da reativação':'Observação (obrigatória para abonar)'}"></td><td><button type="button" class="primary compact" data-save="${i}" ${!p.previsto?'disabled':''}>Salvar dia</button></td></tr>`;
+    }).join('')||'<tr><td colspan="7">Todos os dias deste período estão preenchidos ou pertencem a meses já pagos.</td></tr>';
+    $('#salvarChegadasPreenchidas').disabled=!pendentes.length;
+    history.innerHTML=filled.map((r,i)=>{const late=Number(r.atrasoMinutos)>Number(r.toleranciaMinutos??5),label=late?'Em atraso':r.atrasoMinutos?'Dentro da tolerância':'No horário';
+      return `<tr class="${late?'arrival-row-late':'arrival-row-ontime'}" data-record="${i}"><td><strong>${esc(dataBR(r.data))}</strong></td><td>${esc(r.nome)}</td><td>${esc(r.previsto)}</td><td><strong>${esc(r.chegada)}</strong></td><td><strong>${label}</strong><br><small>${duration(r.atrasoMinutos||0)}${r.abonado?' • Abonado':''}${paid(r)?' • Salário do mês já pago':''}</small></td><td><strong>${money(r.desconto||0)}</strong></td><td>${esc(r.observacao||'—')}</td><td><div class="actions"><button type="button" class="secondary compact" data-edit="${esc(r.id)}" ${paid(r)?'disabled':''}>Corrigir</button><button type="button" class="secondary compact" data-cancel="${esc(r.id)}" ${paid(r)?'disabled':''}>Cancelar</button><button type="button" class="secondary compact" data-history="${esc(r.id)}">Histórico</button></div></td></tr>`;
+    }).join('')||'<tr><td colspan="8">Nenhum dia preenchido neste período.</td></tr>';
+    $('#chegadasResumo').textContent=`${filled.length} dia(s) registrado(s) • Atraso total: ${duration(filled.reduce((s,r)=>s+Number(r.atrasoMinutos||0),0))} • Desconto no período: ${money(filled.reduce((s,r)=>s+Number(r.desconto||0),0))}.`;
   }
   async function load(){
-    if(!isAdmin())return;const seq=++request,body=$('#chegadasBody'),month=$('#chegadasMes'),filter=$('#chegadasFuncionario');
-    if(!month.value)month.value=spToday().slice(0,7);body.innerHTML='<tr><td colspan="8">Carregando...</td></tr>';$('#chegadasMsg').textContent='';
+    if(!isAdmin()||busy||loading)return;
+    const seq=++request;if(!month.value)month.value=dates.initialMonth(todaySP());month.max=todaySP().slice(0,7);
+    const inicio=dates.fifthBusinessDay(month.value),fim=todaySP();
+    if(inicio>fim){pendentes=[];registros=[];body.innerHTML='<tr><td colspan="7">O 5º dia útil desse mês ainda não chegou. Selecione um mês anterior.</td></tr>';history.innerHTML='<tr><td colspan="8">Período ainda não iniciado.</td></tr>';$('#salvarChegadasPreenchidas').disabled=true;$('#chegadasPendentesQtd').textContent='0';$('#chegadasPreenchidasQtd').textContent='0';$('#chegadasResumo').textContent='';$('#chegadasPeriodo').textContent='';return}
+    const previous=filter.value;loading=true;pendentes=[];$('#salvarChegadasPreenchidas').disabled=true;
+    for(const el of [month,filter,$('#chegadasIncluirFolgas'),$('#atualizarChegadas')])el.disabled=true;
+    body.innerHTML='<tr><td colspan="7">Carregando dias...</td></tr>';history.innerHTML='<tr><td colspan="8">Carregando registros...</td></tr>';$('#chegadasMsg').textContent='';
     try{
-      const [users,data]=await Promise.all([api('listarFuncionarios'),api('listarChegadas',{mes:month.value,idFuncionario:filter.value})]);if(seq!==request)return;
-      equipe=(users.funcionarios||[]).filter(x=>!['administrador','revendedor'].includes(String(x.perfil).toLowerCase()));registros=data.registros||[];
-      for(const select of [field('idFuncionario'),filter]){const value=select.value;select.innerHTML=`<option value="">${select===filter?'Todos':'Selecione'}</option>`+equipe.map(x=>`<option value="${esc(x.id)}">${esc(x.nome)}${x.status==='Inativo'?' (inativo)':''}</option>`).join('');select.value=value}
-      const active=registros.filter(r=>!r.cancelado),groups=new Map();
-      for(const r of active){const g=groups.get(r.idFuncionario)||{nome:r.nome,dias:0,atraso:0,tempo:0,desconto:0};g.dias++;g.atraso+=r.atrasoMinutos;g.tempo+=r.minutosDescontados;g.desconto+=r.desconto;groups.set(r.idFuncionario,g)}
-      $('#chegadasResumo').textContent=`${active.length} chegada(s) • Atraso total: ${duration(active.reduce((s,r)=>s+r.atrasoMinutos,0))} • Desconto no mês: ${money(active.reduce((s,r)=>s+r.desconto,0))}.`;
-      $('#chegadasTotaisBody').innerHTML=[...groups.values()].map(g=>`<tr><td>${esc(g.nome)}</td><td>${g.dias}</td><td>${duration(g.atraso)}</td><td>${duration(g.tempo)}</td><td><strong>${money(g.desconto)}</strong></td></tr>`).join('')||'<tr><td colspan="5">Nenhuma chegada ativa neste período.</td></tr>';
-      body.innerHTML=registros.map((r,i)=>`<tr><td>${esc(dataBR(r.data))}</td><td><strong>${esc(r.nome)}</strong><br><small>${money(r.salario)} / ${Number(r.horasMensais)}h</small></td><td>${esc(r.previsto)}</td><td>${esc(r.chegada)}</td><td>${duration(r.atrasoMinutos)}</td><td><strong>${money(r.cancelado?0:r.desconto)}</strong><br><small>${r.cancelado?'Cancelado':r.abonado?'Abonado':r.minutosDescontados?'Descontado':'Sem desconto'}</small></td><td>${esc(r.observacao||'—')}<br><small>${esc(r.atualizadoPor)} • ${esc(new Date(r.atualizadoEm).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'}))}</small></td><td><div class="actions"><button type="button" class="secondary compact" data-edit="${i}">${r.cancelado?'Restaurar':'Corrigir'}</button>${!r.cancelado?`<button type="button" class="secondary compact" data-cancel="${i}">Cancelar</button>`:''}<button type="button" class="secondary compact" data-history="${i}">Histórico</button></div></td></tr>`).join('')||'<tr><td colspan="8">Nenhuma chegada registrada neste período.</td></tr>';
-      if(!field('data').value)reset();else preview();
-    }catch(e){if(seq!==request)return;registros=[];body.innerHTML='<tr><td colspan="8">Não foi possível carregar os registros.</td></tr>';$('#chegadasTotaisBody').innerHTML='';$('#chegadasResumo').textContent='';$('#chegadasMsg').textContent=e.message}
+      const [users,data]=await Promise.all([api('listarFuncionarios'),api('listarChegadas',{inicio,fim})]);if(seq!==request)return;
+      equipe=(users.funcionarios||[]).filter(f=>!['administrador','revendedor'].includes(String(f.perfil).toLowerCase()));
+      filter.innerHTML='<option value="">Todos os funcionários</option>'+equipe.map(f=>`<option value="${esc(f.id)}">${esc(f.nome)}${f.status==='Inativo'?' (inativo)':''}</option>`).join('');filter.value=previous;
+      registros=data.registros||[];mesesPagos=data.mesesPagos||[];loadedDay=fim;render();
+    }catch(e){if(seq!==request)return;pendentes=[];body.innerHTML='<tr><td colspan="7">Não foi possível carregar os dias. Clique em Atualizar.</td></tr>';history.innerHTML='<tr><td colspan="8">Não foi possível carregar os registros.</td></tr>';$('#chegadasMsg').textContent=e.message;$('#salvarChegadasPreenchidas').disabled=true}
+    finally{if(seq===request){loading=false;for(const el of [month,filter,$('#chegadasIncluirFolgas'),$('#atualizarChegadas')])el.disabled=false}}
   }
-  function edit(r){editando=r;field('idFuncionario').value=r.idFuncionario;field('data').value=r.data;field('previsto').value=r.previsto;field('chegada').value=r.chegada;field('tratamento').value=r.abonado?'abonar':'descontar';field('observacao').value='';field('idFuncionario').disabled=true;field('data').disabled=true;setMsg(form,'Informe a justificativa para salvar a correção.');preview();form.scrollIntoView({behavior:'smooth',block:'start'})}
+  body.addEventListener('input',e=>{
+    const tr=e.target.closest('[data-pending]'),name=e.target.dataset.field;if(!tr||!name||busy)return;
+    const p=pendentes[Number(tr.dataset.pending)],d={...draft(p),[name]:name==='abonado'?e.target.checked:e.target.value};drafts.set(p.id,d);
+    const value=preview(p,d),result=tr.querySelector('[data-result]');result.textContent=resultText(value,d);result.className=`arrival-inline-result ${value?.atrasado?'late':value?'ontime':''}`;
+  });
+  function validate(p,d){
+    const f=basis(p);if(!p.previsto)throw Error(`Defina a entrada prevista de ${p.funcionario.nome} na aba Usuários.`);
+    if(!preview(p,d)||!Number.isFinite(Number(f.salario))||Number(f.salario)<=0||Number(f.horasMensais||220)<=0)throw Error(`Confira a chegada, o salário e a jornada de ${p.funcionario.nome} em ${dataBR(p.data)}.`);
+    if((d.abonado||p.anterior)&&!d.observacao.trim())throw Error(`Informe a justificativa de ${p.funcionario.nome} em ${dataBR(p.data)}.`);
+  }
+  async function savePending(items){
+    if(busy||loading)return;const msg=$('#chegadasPendentesMsg');msg.textContent='';
+    const chosen=items.map(p=>({p,d:{...draft(p)}}));
+    if(!chosen.length){msg.textContent='Informe pelo menos um horário de chegada para salvar.';return}
+    try{for(const {p,d} of chosen)validate(p,d)}catch(e){msg.textContent=e.message;return}
+    // Uma confirmação para o lote, mantendo a verificação de senha no servidor.
+    const senha=await pedirSenhaConfirmacao('salvarChegada');if(senha===null)return;setBusy(true);
+    let saved=0,error='';
+    try{
+      for(const {p,d} of chosen){
+        try{const result=await api('salvarChegada',{idFuncionario:p.funcionario.id,data:p.data,previsto:p.previsto,chegada:d.chegada,abonado:d.abonado,observacao:d.observacao,versao:p.anterior?.versao||p.anterior?.atualizadoEm||'',senhaConfirmacao:senha});registros=registros.filter(r=>r.id!==result.registro.id);registros.push(result.registro);drafts.delete(p.id);saved++;msg.textContent=`Salvando: ${saved} de ${chosen.length}...`}
+        catch(e){error=`${p.funcionario.nome} • ${dataBR(p.data)}: ${e.message}`;break}
+      }
+    }finally{setBusy(false);registros.sort((a,b)=>b.data.localeCompare(a.data)||a.nome.localeCompare(b.nome));render()}
+    msg.textContent=`${saved} dia(s) salvo(s).${error?' '+error+' Os campos ainda não salvos foram preservados.':''}`;
+  }
+  body.addEventListener('click',e=>{const b=e.target.closest('[data-save]');if(b)savePending([pendentes[Number(b.dataset.save)]])});
+  $('#salvarChegadasPreenchidas').addEventListener('click',()=>savePending(pendentes.filter(p=>draft(p).chegada)));
+  function edit(r){
+    if(paid(r)){ $('#chegadasMsg').textContent='Reabra o salário deste mês em Pagamentos antes de corrigir a chegada.';return }
+    editando=r;field('idFuncionario').value=r.idFuncionario;field('data').value=r.data;field('previsto').value=r.previsto;field('chegada').value=r.chegada;field('tratamento').value=r.abonado?'abonar':'descontar';field('observacao').value='';
+    $('#chegadaEdicaoTitulo').textContent=`${r.nome} • ${dataBR(r.data)}`;$('#chegadaEdicaoPanel').classList.remove('hidden');setMsg(form,'Informe a justificativa da correção.');editPreview();$('#chegadaEdicaoPanel').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function editPreview(){if(!editando)return;const d={abonado:field('tratamento').value==='abonar'},value=dates.calculation({...editando,previsto:field('previsto').value,chegada:field('chegada').value,...d});$('#chegadaCalculo').textContent=resultText(value,d)}
+  form.addEventListener('input',editPreview);
   form.addEventListener('submit',async e=>{
-    e.preventDefault();const button=form.querySelector('[type=submit]');button.disabled=true;setMsg(form,'Salvando...');
-    const d={idFuncionario:field('idFuncionario').value,data:field('data').value,previsto:field('previsto').value,chegada:field('chegada').value,abonado:field('tratamento').value==='abonar',observacao:field('observacao').value,versao:editando?.versao||editando?.atualizadoEm||''};
-    try{await api('salvarChegada',d);$('#chegadasMes').value=d.data.slice(0,7);reset();setMsg(form,'Chegada salva e desconto atualizado.',true);await load()}catch(e){setMsg(form,e.message)}finally{button.disabled=false}
+    e.preventDefault();if(!editando||busy)return;const r=editando;
+    const payload={idFuncionario:r.idFuncionario,data:r.data,previsto:field('previsto').value,chegada:field('chegada').value,abonado:field('tratamento').value==='abonar',observacao:field('observacao').value,versao:r.versao||r.atualizadoEm};setBusy(true);
+    try{const result=await api('salvarChegada',payload);registros=registros.map(x=>x.id===r.id?result.registro:x);closeEdit();render();$('#chegadasMsg').textContent='Chegada corrigida.'}catch(e){setMsg(form,e.message)}finally{setBusy(false)}
   });
-  $('#chegadasBody').addEventListener('click',async e=>{
-    const b=e.target.closest('button');if(!b)return;
-    if(b.dataset.edit!==undefined){edit(registros[Number(b.dataset.edit)]);return}
-    if(b.dataset.history!==undefined){const r=registros[Number(b.dataset.history)],history=[r,...(r.historico||[]).slice().reverse()];alert(history.map(x=>`${x.atualizadoPor} • ${new Date(x.atualizadoEm).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'})}\nPrevisto ${x.previsto} / chegada ${x.chegada} • ${money(x.cancelado?0:x.desconto)}${x.cancelado?' • Cancelado':x.abonado?' • Abonado':''}\n${x.observacao||'Sem observação'}`).join('\n\n'));return}
-    if(b.dataset.cancel!==undefined){const r=registros[Number(b.dataset.cancel)],observacao=prompt('Justificativa para cancelar esta chegada:');if(!observacao?.trim())return;b.disabled=true;try{await api('salvarChegada',{idFuncionario:r.idFuncionario,data:r.data,previsto:r.previsto,chegada:r.chegada,abonado:r.abonado,cancelado:true,observacao,versao:r.versao||r.atualizadoEm});if(editando?.id===r.id)reset();await load()}catch(e){$('#chegadasMsg').textContent=e.message}finally{b.disabled=false}}
+  history.addEventListener('click',async e=>{
+    const b=e.target.closest('button');if(!b||busy)return;
+    const id=b.dataset.edit||b.dataset.cancel||b.dataset.history,r=registros.find(x=>x.id===id);if(!r)return;
+    if(b.dataset.edit){edit(r);return}
+    if(b.dataset.history){alert([r,...(r.historico||[]).slice().reverse()].map(x=>`${x.atualizadoPor} • ${new Date(x.atualizadoEm).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'})}\nPrevisto ${x.previsto} / chegada ${x.chegada} • ${money(x.cancelado?0:x.desconto)}${x.cancelado?' • Cancelado':x.abonado?' • Abonado':''}\n${x.observacao||'Sem observação'}`).join('\n\n'));return}
+    if(b.dataset.cancel){const observacao=prompt('Justificativa para cancelar esta chegada:');if(!observacao?.trim())return;try{const result=await api('salvarChegada',{idFuncionario:r.idFuncionario,data:r.data,previsto:r.previsto,chegada:r.chegada,abonado:r.abonado,cancelado:true,observacao,versao:r.versao||r.atualizadoEm});registros=registros.map(x=>x.id===r.id?result.registro:x);if(editando?.id===r.id)closeEdit();render();$('#chegadasMsg').textContent='Registro cancelado. O dia voltou para a lista de preenchimento.'}catch(e){$('#chegadasMsg').textContent=e.message}}
   });
-  field('idFuncionario').addEventListener('change',expected);field('data').addEventListener('change',expected);form.addEventListener('input',preview);
-  $('#cancelarEdicaoChegada').addEventListener('click',reset);$('#chegadasMes').addEventListener('change',load);$('#chegadasFuncionario').addEventListener('change',load);$('#atualizarChegadas').addEventListener('click',load);
+  $('#cancelarEdicaoChegada').addEventListener('click',closeEdit);
+  month.addEventListener('change',()=>{closeEdit();load()});filter.addEventListener('change',()=>{closeEdit();if(!loading)render()});$('#chegadasIncluirFolgas').addEventListener('change',()=>{if(!loading)render()});$('#atualizarChegadas').addEventListener('click',load);
   $('.nav-btn[data-page="chegadas"]').addEventListener('click',()=>{if(isAdmin())load()});
-  reset();
+  function nextDay(){if(isAdmin()&&!busy&&page.classList.contains('active')&&loadedDay&&loadedDay!==todaySP())load()}
+  window.addEventListener('focus',nextDay);document.addEventListener('visibilitychange',()=>{if(!document.hidden)nextDay()});setInterval(nextDay,60000);
 })();
