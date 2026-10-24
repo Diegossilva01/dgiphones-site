@@ -11,13 +11,13 @@ const podeEditar=r=>isAdmin()||String(r?.['ID Funcionário']||'')===String(state
 const API_TIMEOUT_MS=25000;
 const API_TENTATIVAS_LEITURA=4;
 const ACOES_RETRY_SEGURO=new Set([
-  'verificarToken','dashboard','dadosSistema','listarCompras','listarEstoque',
+  'listarChegadas','verificarToken','dashboard','dadosSistema','listarCompras','listarEstoque',
   'listarProdutosSite','listarCatalogoRevendedor','listarVendas','listarFuncionarios',
   'listarFinanceiroEquipe','listarVendasComissao','listarVales','listarRevendedores','listarOS','listarLeadsSite','localizarOSContato'
 ]);
 const esperar=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const ACOES_CONFIRMAR_SENHA=new Set([
-  'cadastrarCompra','excluirCompra','editarCompra',
+  'salvarChegada','cadastrarCompra','excluirCompra','editarCompra',
   'atualizarProdutoSite','excluirProdutoSite',
   'cadastrarVenda','excluirVenda','editarVenda',
   'cadastrarFuncionario','excluirFuncionario','removerFuncionario','deletarFuncionario',
@@ -25,6 +25,7 @@ const ACOES_CONFIRMAR_SENHA=new Set([
   'solicitarVale','alterarStatusVale','cadastrarRevendedor','cadastrarOS','cadastrarNotaProduto'
 ]);
 const ROTULOS_CONFIRMACAO_SENHA={
+  salvarChegada:'salvar esta chegada ou correção',
   cadastrarCompra:'salvar esta compra',
   excluirCompra:'excluir esta compra',
   editarCompra:'alterar esta compra',
@@ -552,6 +553,7 @@ async function loadPagamentos(){
       if(totalEl){totalEl.textContent=money(totalAtual);totalEl.classList.toggle('negative-balance',totalAtual<0)}
       if($("#workerPagamentoData"))$("#workerPagamentoData").textContent=item.dataPagamentoBR||financeiro.dataPagamentoBR||'—';
       if($("#workerPagamentoStatus"))$("#workerPagamentoStatus").innerHTML=statusPagamento(item);
+      if($('#workerAtrasosInfo'))$('#workerAtrasosInfo').textContent=`Atrasos descontados: ${money(item.descontoAtrasos||0)} • ${Math.floor((item.minutosDescontados||0)/60)}h ${(item.minutosDescontados||0)%60}min no mês.`;
       configurarPix(item.chavePix||'',item.tipoChavePix||'');
       await loadValesFuncionario(mes);
       if(workerMsg)workerMsg.textContent=`Pagamentos atualizados para ${mes.split('-').reverse().join('/')}.`;
@@ -568,7 +570,7 @@ async function loadPagamentos(){
     $("#financeVencimento").textContent=j.dataPagamentoBR||'—';
     $("#financeSalario").textContent=money(j.resumo?.salariosLiquidos??j.resumo?.salarios??0);$("#financeVale").textContent=money(j.resumo?.valeRefeicao||0);$("#financeComissao").textContent=money(j.resumo?.comissoes||0);$("#financeTotal").textContent=money(j.resumo?.totalPagar??j.resumo?.totalAcumulado??0);
     $("#financeVendas").textContent=Number(j.vendasCompartilhadas||0);
-    body.innerHTML=itens.length?itens.map(item=>{return `<tr><td><strong>${esc(item.nome)}</strong><br><small>${esc(item.perfil||'')} • desde ${esc(item.dataCadastro||'—')}</small></td><td><strong>${money(item.salarioLiquido??item.salarioCalculado)}</strong><br><small>Salário mensal ${money(item.salarioCalculado)}${Number(item.valesAprovados||0)>0?` • vales -${money(item.valesAprovados)}`:''}</small></td><td><strong>${money(item.valeRefeicaoCalculado)}</strong></td><td><strong>${money(item.comissaoCalculada)}</strong><br><small>2% de ${money(item.faturamento)} • ${item.vendas||0} venda(s) aprovada(s)</small></td><td><strong>${money(item.totalPagar)}</strong><br><small>Total ainda a pagar</small></td><td><span class="pay-date">${esc(item.dataPagamentoBR||'—')}</span></td><td>${item.chavePix?`<span class="pix-key"><i class="fa-brands fa-pix"></i><span>${esc(item.chavePix)}<small>${esc(item.tipoChavePix||'Tipo não informado')}</small></span></span>`:'<span class="muted">Não cadastrada</span>'}</td><td>${statusPagamento(item)}</td><td>${acoesPagamento(item,mes)}</td></tr>`}).join(''):'<tr><td colspan="9">Nenhum funcionário participante da comissão.</td></tr>';
+    body.innerHTML=itens.length?itens.map(item=>{return `<tr><td><strong>${esc(item.nome)}</strong><br><small>${esc(item.perfil||'')} • desde ${esc(item.dataCadastro||'—')}</small></td><td><strong>${money(item.salarioLiquido??item.salarioCalculado)}</strong><br><small>Salário mensal ${money(item.salarioCalculado)}${Number(item.descontoAtrasos||0)>0?` • atrasos -${money(item.descontoAtrasos)} (${Math.floor(item.minutosDescontados/60)}h ${item.minutosDescontados%60}min)`:''}${Number(item.valesAprovados||0)>0?` • vales -${money(item.valesAprovados)}`:''}</small></td><td><strong>${money(item.valeRefeicaoCalculado)}</strong></td><td><strong>${money(item.comissaoCalculada)}</strong><br><small>2% de ${money(item.faturamento)} • ${item.vendas||0} venda(s) aprovada(s)</small></td><td><strong>${money(item.totalPagar)}</strong><br><small>Total ainda a pagar</small></td><td><span class="pay-date">${esc(item.dataPagamentoBR||'—')}</span></td><td>${item.chavePix?`<span class="pix-key"><i class="fa-brands fa-pix"></i><span>${esc(item.chavePix)}<small>${esc(item.tipoChavePix||'Tipo não informado')}</small></span></span>`:'<span class="muted">Não cadastrada</span>'}</td><td>${statusPagamento(item)}</td><td>${acoesPagamento(item,mes)}</td></tr>`}).join(''):'<tr><td colspan="9">Nenhum funcionário participante da comissão.</td></tr>';
     await loadValesAdmin(mes);
   }catch(e){body.innerHTML='<tr><td colspan="9">Não foi possível carregar.</td></tr>';msg.textContent=e.message}
 }
@@ -761,7 +763,7 @@ async function loadFuncionarios(){
     </tr>`).join(''):'<tr><td colspan="10">Nenhum funcionário cadastrado.</td></tr>';
   }catch(e){body.innerHTML='<tr><td colspan="10">Não foi possível carregar.</td></tr>';msg.textContent=e.message}
 }
-window.editarFuncionario=id=>{const x=(state.funcionarios||[]).find(f=>String(f.id)===String(id));if(!x)return;const f=$("#usuarioForm");f.idFuncionario.value=x.id;f.nome.value=x.nome||'';f.usuario.value=x.usuario||'';f.perfil.value=x.perfil||'Funcionário';f.salario.value=Number(x.salario||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});f.valeRefeicaoDia.value=Number(x.valeRefeicaoDia||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});f.diasSemana.value=String(x.diasSemana||6);f.status.value=x.status||'Ativo';f.senha.value='';f.senha.required=false;$("#senhaAjuda").textContent='Deixe em branco para manter a senha atual.';$("#usuarioFormTitulo").textContent='Editar funcionário';$("#salvarFuncionarioBtn").textContent='Salvar alterações';$("#cancelarEdicaoFuncionario").classList.remove('hidden');f.scrollIntoView({behavior:'smooth',block:'start'})};
+window.editarFuncionario=id=>{const x=(state.funcionarios||[]).find(f=>String(f.id)===String(id));if(!x)return;const f=$("#usuarioForm");f.idFuncionario.value=x.id;f.nome.value=x.nome||'';f.usuario.value=x.usuario||'';f.perfil.value=x.perfil||'Funcionário';f.salario.value=Number(x.salario||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});f.valeRefeicaoDia.value=Number(x.valeRefeicaoDia||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});f.diasSemana.value=String(x.diasSemana||6);f.horarioEntrada.value=x.horarioEntrada||'';f.horarioSabado.value=x.horarioSabado||'';f.horasMensais.value=x.horasMensais||220;f.toleranciaMinutos.value=x.toleranciaMinutos??5;f.status.value=x.status||'Ativo';f.senha.value='';f.senha.required=false;$("#senhaAjuda").textContent='Deixe em branco para manter a senha atual.';$("#usuarioFormTitulo").textContent='Editar funcionário';$("#salvarFuncionarioBtn").textContent='Salvar alterações';$("#cancelarEdicaoFuncionario").classList.remove('hidden');f.scrollIntoView({behavior:'smooth',block:'start'})};
 $("#cancelarEdicaoFuncionario")?.addEventListener('click',resetFuncionarioForm);
 window.excluirFuncionario=async(id,nome)=>{
   if(!confirm(`Excluir o cadastro de ${nome}? Essa pessoa perderá o acesso ao sistema.`))return;
@@ -866,3 +868,4 @@ document.addEventListener('scroll',e=>{
   const index=Math.round(gallery.scrollLeft/Math.max(gallery.clientWidth,1));
   updateResellerGallery(wrap,index);
 },true);
+
